@@ -1,0 +1,39 @@
+{
+  "model_id": "jacoballessio/ai-image-detect-distilled",
+  "model_revision": "4098d40c873a2e38404ea378a8284f33125bd90c",
+  "startup_seconds": 8.365,
+  "startup_note": "Includes model download when cache is empty",
+  "purpose": "sanity check, not benchmark",
+  "results": [
+    {
+      "source": "COCO val2017 image 000000019402, v3 manifest",
+      "note": "Earlier A3 final-view miss; smoke check only",
+      "sha256": "b08173e02dc865e7f13fecbcbed574b70271c07fef6023236d0dea8d6bf77619",
+      "known_origin": "real",
+      "prediction": "fake",
+      "fake_model_score": 0.512428,
+      "real_model_score": 0.487572,
+      "inference_seconds": 0.179
+    },
+    {
+      "source": "heikeadel/cocoxgen SDXL 37740 short, v3 manifest",
+      "note": "Earlier A3 final-view miss; smoke check only",
+      "sha256": "09f0691968896a6bdc0c761618fb5ea1ea919fe5669a4d06d319764105b24ac3",
+      "known_origin": "fake",
+      "prediction": "fake",
+      "fake_model_score": 0.560301,
+      "real_model_score": 0.439699,
+      "inference_seconds": 0.048
+    },
+    {
+      "source": "heikeadel/cocoxgen SDXL 119641 long, v3 manifest",
+      "note": "Earlier A3 final-view miss; smoke check only",
+      "sha256": "7e52ea4a26233c496a755363ef6464b285f96f5a8ad1e0b88b2c303e3c458c3d",
+      "known_origin": "fake",
+      "prediction": "real",
+      "fake_model_score": 0.484775,
+      "real_model_score": 0.515226,
+      "inference_seconds": 0.047
+    }
+  ]
+}

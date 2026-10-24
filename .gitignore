@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+model-cache/
+*.log
+.tmp/
+.pip-cache/
+.npm-cache/
+*.tsbuildinfo
+.local/
