@@ -2,7 +2,7 @@
 
 ## Current status
 
-This repository currently runs on one PC. No AWS resources have been created. The synopsis describes a future AWS design, but it also describes an older DINOv2/FFT model. This project uses the credited ViT model named in the README.
+This repository currently runs on one PC. No AWS resources have been created. The synopsis describes a future AWS design, but it also describes an older DINOv2/FFT model. This project uses the credited ONNX detector named in the README.
 
 ## Terms
 

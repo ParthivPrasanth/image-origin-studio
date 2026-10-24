@@ -5,6 +5,7 @@ type Result = {
   model_scores: { fake: number; real: number };
   model_id: string;
   model_revision: string;
+  ai_score_threshold: number;
   elapsed_ms: number;
   image_format: string;
 };
@@ -141,7 +142,9 @@ export default function App() {
         "prediction",
         "fake_model_score",
         "real_model_score",
+        "model_id",
         "model_revision",
+        "ai_score_threshold",
         "elapsed_ms",
       ],
       ...items
@@ -151,7 +154,9 @@ export default function App() {
           item.result!.prediction,
           String(item.result!.model_scores.fake),
           String(item.result!.model_scores.real),
+          item.result!.model_id,
           item.result!.model_revision,
+          String(item.result!.ai_score_threshold),
           String(item.result!.elapsed_ms),
         ]),
     ];
@@ -196,9 +201,9 @@ export default function App() {
           <div className="eyebrow">IMAGE ANALYSIS / LOCAL DEMO</div>
           <h1>Explore what the model sees.</h1>
           <p>
-            Upload a photograph or generated image to compare the model’s two
-            scores. Its prediction is a clue for investigation, never proof of
-            an image’s origin.
+            Upload a photograph or generated image to inspect an experimental
+            model’s score. It made mistakes in a small dataset-labeled check, so
+            use its result as a clue, never proof of an image’s origin.
           </p>
         </section>
         <div className="workspace">
@@ -352,7 +357,7 @@ export default function App() {
                             <p
                               className={`prediction ${item.result.prediction}`}
                             >
-                              Model predicts{" "}
+                              Experimental model suggests{" "}
                               <strong>
                                 {item.result.prediction === "fake"
                                   ? "AI-generated"
@@ -372,7 +377,7 @@ export default function App() {
                                 />
                               </div>
                               <div>
-                                <span>Real model score</span>
+                                <span>Complementary real score</span>
                                 <strong>
                                   {score(item.result.model_scores.real)}
                                 </strong>
@@ -383,6 +388,11 @@ export default function App() {
                                 />
                               </div>
                             </div>
+                            <p className="result-meta">
+                              AI flagging cutoff:{" "}
+                              {score(item.result.ai_score_threshold)}. Scores
+                              are estimates, not certainty.
+                            </p>
                             <p className="result-meta">
                               Model revision{" "}
                               {item.result.model_revision.slice(0, 8)} ·{" "}
@@ -402,21 +412,23 @@ export default function App() {
           <div className="eyebrow">HOW TO READ A RESULT</div>
           <h2>A score is not a verdict.</h2>
           <p>
-            These are the model’s relative scores for its two training labels. A
-            high score can still be wrong, especially for unfamiliar generators,
-            edits, compression, or images unlike its training data.
+            The AI score is calibrated on the model author’s development data;
+            the real score is its complement. The published 65% cutoff decides
+            the label. A high score can still be wrong, especially for
+            unfamiliar generators, edits, or images unlike its training data.
           </p>
           <p>
             Model:{" "}
             <a
-              href="https://huggingface.co/jacoballessio/ai-image-detect-distilled"
+              href="https://huggingface.co/Thermostatic/community-forensics-frontier-detector-2026-08"
               target="_blank"
               rel="noreferrer"
             >
-              jacoballessio/ai-image-detect-distilled
+              Thermostatic/community-forensics-frontier-detector-2026-08
             </a>
-            . The model author reports 74% validation accuracy; that figure does
-            not measure this app’s performance on your uploads.
+            . In one separate 60-image check, this app got 25 of 30 real and 26
+            of 30 fully generated images right. That small sample does not
+            predict performance on your uploads.
           </p>
         </aside>
       </main>

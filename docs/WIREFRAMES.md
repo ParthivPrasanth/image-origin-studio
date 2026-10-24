@@ -26,8 +26,8 @@ How to read a result / credited model
 Choose images                    Review results
                                 [Analyze images] [Export CSV]
                                 [thumbnail] name   Processing…
-                                [thumbnail] name   Model predicts Real
-                                                   both model scores
+                                [thumbnail] name   Experimental model suggests Real
+                                                   AI score, complement, cutoff
                                                    model revision, time
 ```
 

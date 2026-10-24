@@ -5,7 +5,7 @@ from PIL import Image
 
 from app import main
 from app.main import app
-from app.model import MODEL_REVISION, Scores
+from app.model import MODEL_REVISION, SCORE_THRESHOLD, Scores
 
 
 class FakeDetector:
@@ -40,6 +40,7 @@ def test_valid_image_returns_both_scores_and_revision():
     assert result["prediction"] == "fake"
     assert result["model_scores"] == {"fake": 0.8, "real": 0.2}
     assert result["model_revision"] == MODEL_REVISION
+    assert result["ai_score_threshold"] == SCORE_THRESHOLD
 
 
 def test_corrupt_image_is_rejected():

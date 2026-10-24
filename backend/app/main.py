@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
 
-from .model import MODEL_ID, MODEL_REVISION, get_detector
+from .model import MODEL_ID, MODEL_REVISION, SCORE_THRESHOLD, get_detector
 from .validation import read_valid_image
 
 logger = logging.getLogger(__name__)
@@ -21,6 +21,7 @@ class AnalysisResult(BaseModel):
     model_scores: dict[str, float]
     model_id: str = MODEL_ID
     model_revision: str = MODEL_REVISION
+    ai_score_threshold: float = SCORE_THRESHOLD
     elapsed_ms: float = Field(ge=0)
     image_format: str
 
@@ -43,6 +44,7 @@ async def analyze(file: UploadFile) -> AnalysisResult:
     return AnalysisResult(
         prediction=scores.label,
         model_scores={"fake": scores.fake, "real": scores.real},
+        ai_score_threshold=SCORE_THRESHOLD,
         elapsed_ms=round((perf_counter() - started) * 1000, 1),
         image_format=image_format,
     )
