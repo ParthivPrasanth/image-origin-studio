@@ -212,6 +212,57 @@ main {
   font-size: 13px;
   line-height: 1.4;
 }
+.model-selector {
+  border: 1px solid #dfe8e3;
+  border-radius: 12px;
+  margin: 22px 0 0;
+  padding: 13px 15px 12px;
+}
+.model-selector legend {
+  padding: 0 6px;
+  color: #314d4a;
+  font-size: 13px;
+  font-weight: 700;
+}
+.model-selector > p {
+  margin: 0 0 11px;
+  color: #687873;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.model-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 8px 0;
+  border: 1px solid #e1e8e2;
+  border-radius: 9px;
+  padding: 10px;
+  cursor: pointer;
+}
+.model-choice:has(input:checked) {
+  border-color: #9ebfba;
+  background: #f4f9f6;
+}
+.model-choice input {
+  margin-top: 3px;
+  accent-color: #24676c;
+}
+.model-choice span {
+  display: grid;
+  gap: 3px;
+}
+.model-choice strong {
+  font-size: 13px;
+}
+.model-choice small {
+  color: #697873;
+  font-size: 11px;
+}
+.model-selector .selector-note {
+  margin: 11px 0 0;
+  font-size: 11px;
+}
 .results-panel {
   min-height: 465px;
 }
@@ -289,6 +340,73 @@ main {
   border-radius: 8px;
   background: #e7ebe7;
   flex: none;
+}
+.result-card .analysis {
+  margin-top: 13px;
+}
+.result-scope {
+  margin: 0 0 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #61726e;
+}
+.disagreement {
+  background: #fff4e7;
+  border: 1px solid #e8c9a3;
+  border-radius: 8px;
+  color: #805329;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0 0 10px;
+  padding: 9px 10px;
+}
+.model-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.model-result {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #dde7e1;
+  border-radius: 9px;
+  background: #fbfcfa;
+}
+.model-result:only-child {
+  grid-column: 1 / -1;
+}
+.model-result-heading {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.model-result-heading h4 {
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+  line-height: 1.3;
+  margin: 0;
+}
+.model-result-heading span {
+  color: #73837e;
+  font-size: 10px;
+}
+.model-result-heading .prediction {
+  margin: 6px 0 0;
+  color: #536560;
+  font-size: 12px;
+}
+.model-error {
+  color: #a34738;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 8px 0 0;
+}
+.model-identity {
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+.reanalyze {
+  margin-top: 7px;
 }
 .result-body {
   min-width: 0;
@@ -452,6 +570,9 @@ footer {
   }
   .result-top h3 {
     max-width: 180px;
+  }
+  .model-results {
+    grid-template-columns: 1fr;
   }
   .about {
     padding: 21px;

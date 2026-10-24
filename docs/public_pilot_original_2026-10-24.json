@@ -1,0 +1,525 @@
+{
+  "purpose": "paired diagnostic; sample and source overlap limits apply",
+  "created_utc": "2026-10-24T13:01:45.323789+00:00",
+  "manifest_sha256": "994bd2a6cd7c65296936b5fea4aa0dba68ab7ff1cf4ddb3d2a8203c961c9328d",
+  "variant": "original",
+  "model_keys": [
+    "v3_e2",
+    "community_forensics"
+  ],
+  "models": {
+    "v3_e2": {
+      "id": "owner-trained-v3-e2",
+      "revision": "v3-e2-e560a8a20a84",
+      "artifact_sha256": "7b18530b038cac4332095b00bf04690e91c79c15d0ae9acfe32d22187852fa5c",
+      "backbone_sha256": "047dcff4addef86ea5bc2eff13c9614dc11f47ab1160d0a71a25e7db994f4e1f"
+    },
+    "community_forensics": {
+      "id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+      "revision": "16db135220b318d811b207db576d90368980b595"
+    }
+  },
+  "sample_count": 12,
+  "metrics": {
+    "v3_e2": {
+      "tp": 4,
+      "fn": 2,
+      "fp": 4,
+      "tn": 2,
+      "errors": 0,
+      "balanced_accuracy_on_successful_rows": 0.5,
+      "real_false_positive_rate_on_successful_rows": 0.6666666666666666
+    },
+    "community_forensics": {
+      "tp": 6,
+      "fn": 0,
+      "fp": 0,
+      "tn": 6,
+      "errors": 0,
+      "balanced_accuracy_on_successful_rows": 1.0,
+      "real_false_positive_rate_on_successful_rows": 0.0
+    }
+  },
+  "results": [
+    {
+      "path": "ai/animal/flux_2_flex_animal_01.png",
+      "sha256": "ccfd604c4c1889793d751984314eb36462bea022725c9b910c5f74552da4c079",
+      "known_origin": "fake",
+      "source_id": "ai_animal_flux_2_flex_animal_01.png",
+      "category": "animal",
+      "generator": "Flux",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/ai/animal/flux_2_flex_animal_01.png",
+      "license": "API-generated research use per dataset card",
+      "evaluated_sha256": "ccfd604c4c1889793d751984314eb36462bea022725c9b910c5f74552da4c079",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9258867502212524,
+            "real": 0.07411324977874756
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 5483.5
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9999997790645982,
+            "real": 2.2093540175127657e-07
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 1489.6
+        }
+      ]
+    },
+    {
+      "path": "ai/art/flux_2_flex_art_01.png",
+      "sha256": "5c49a5807f2cec13dee70b74dd693f829973f6114023dccb295afd44eeea5d8d",
+      "known_origin": "fake",
+      "source_id": "ai_art_flux_2_flex_art_01.png",
+      "category": "art",
+      "generator": "Flux",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/ai/art/flux_2_flex_art_01.png",
+      "license": "API-generated research use per dataset card",
+      "evaluated_sha256": "5c49a5807f2cec13dee70b74dd693f829973f6114023dccb295afd44eeea5d8d",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.06949558109045029,
+            "real": 0.9305044189095497
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 49.8
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9999993669043681,
+            "real": 6.33095631918934e-07
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 409.1
+        }
+      ]
+    },
+    {
+      "path": "ai/food/flux_2_flex_food_01.png",
+      "sha256": "87c65eb61f6ad758177bc1f8ce0fa7c7f6b04a6bb45e4686a067a6936a8bf315",
+      "known_origin": "fake",
+      "source_id": "ai_food_flux_2_flex_food_01.png",
+      "category": "food",
+      "generator": "Flux",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/ai/food/flux_2_flex_food_01.png",
+      "license": "API-generated research use per dataset card",
+      "evaluated_sha256": "87c65eb61f6ad758177bc1f8ce0fa7c7f6b04a6bb45e4686a067a6936a8bf315",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9769064784049988,
+            "real": 0.02309352159500122
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 39.9
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9999992649334334,
+            "real": 7.350665666150391e-07
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 388.2
+        }
+      ]
+    },
+    {
+      "path": "ai/landscape/flux_2_flex_landscape_01.png",
+      "sha256": "6006fac74f4c12fca47bb341be131b59bc40fbcc148c78c7afe6242920cbced2",
+      "known_origin": "fake",
+      "source_id": "ai_landscape_flux_2_flex_landscape_01.png",
+      "category": "landscape",
+      "generator": "Flux",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/ai/landscape/flux_2_flex_landscape_01.png",
+      "license": "API-generated research use per dataset card",
+      "evaluated_sha256": "6006fac74f4c12fca47bb341be131b59bc40fbcc148c78c7afe6242920cbced2",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.0013325231848284602,
+            "real": 0.9986674768151715
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 57.3
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9999991916488615,
+            "real": 8.083511384704423e-07
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 402.9
+        }
+      ]
+    },
+    {
+      "path": "ai/portrait/flux_2_flex_portrait_01.png",
+      "sha256": "4638c734a78e3b21b97ae0a78a6ebf0588370298aacf4c5a10eabd9a6e29f715",
+      "known_origin": "fake",
+      "source_id": "ai_portrait_flux_2_flex_portrait_01.png",
+      "category": "portrait",
+      "generator": "Flux",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/ai/portrait/flux_2_flex_portrait_01.png",
+      "license": "API-generated research use per dataset card",
+      "evaluated_sha256": "4638c734a78e3b21b97ae0a78a6ebf0588370298aacf4c5a10eabd9a6e29f715",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9999493360519409,
+            "real": 5.066394805908203e-05
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 44.9
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.999998024688478,
+            "real": 1.9753115220177975e-06
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 422.8
+        }
+      ]
+    },
+    {
+      "path": "ai/product/flux_2_flex_product_01.png",
+      "sha256": "1a37e15851d2444bd3c0176e29a782a5790317598dbc467d9fe25eae5392c467",
+      "known_origin": "fake",
+      "source_id": "ai_product_flux_2_flex_product_01.png",
+      "category": "product",
+      "generator": "Flux",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/ai/product/flux_2_flex_product_01.png",
+      "license": "API-generated research use per dataset card",
+      "evaluated_sha256": "1a37e15851d2444bd3c0176e29a782a5790317598dbc467d9fe25eae5392c467",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9986351132392883,
+            "real": 0.00136488676071167
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 60.7
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9999844150121181,
+            "real": 1.5584987881900325e-05
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 422.0
+        }
+      ]
+    },
+    {
+      "path": "real/animal/animal_034_-Ylz_tc8NOk.jpg",
+      "sha256": "60e7c7cdc8cf5bd2d190343d4e71b699a0a9b2b6daa0d2a153ee386377cde918",
+      "known_origin": "real",
+      "source_id": "real_animal_animal_034_-Ylz_tc8NOk.jpg",
+      "category": "animal",
+      "generator": "",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/real/animal/animal_034_-Ylz_tc8NOk.jpg",
+      "license": "Unsplash License",
+      "evaluated_sha256": "60e7c7cdc8cf5bd2d190343d4e71b699a0a9b2b6daa0d2a153ee386377cde918",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9977937936782837,
+            "real": 0.0022062063217163086
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 115.5
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.0037401510802517936,
+            "real": 0.9962598489197482
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 426.9
+        }
+      ]
+    },
+    {
+      "path": "real/art/art_032_puf8VwPLAug.jpg",
+      "sha256": "e0890fca8fb4778ad7664fc5f6ae768bf236beef8633bb128d3d1cb0f398f9ee",
+      "known_origin": "real",
+      "source_id": "real_art_art_032_puf8VwPLAug.jpg",
+      "category": "art",
+      "generator": "",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/real/art/art_032_puf8VwPLAug.jpg",
+      "license": "Unsplash License",
+      "evaluated_sha256": "e0890fca8fb4778ad7664fc5f6ae768bf236beef8633bb128d3d1cb0f398f9ee",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.003209961112588644,
+            "real": 0.9967900388874114
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 176.0
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.0018899517638672888,
+            "real": 0.9981100482361327
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 534.9
+        }
+      ]
+    },
+    {
+      "path": "real/food/food_034_dY7ONzZzoU8.jpg",
+      "sha256": "539e992c759142558568c1b37023f1c926198493dc80f89ab705b669e0f216e4",
+      "known_origin": "real",
+      "source_id": "real_food_food_034_dY7ONzZzoU8.jpg",
+      "category": "food",
+      "generator": "",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/real/food/food_034_dY7ONzZzoU8.jpg",
+      "license": "Unsplash License",
+      "evaluated_sha256": "539e992c759142558568c1b37023f1c926198493dc80f89ab705b669e0f216e4",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.9751463532447815,
+            "real": 0.024853646755218506
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 84.7
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 3.875636698571609e-05,
+            "real": 0.9999612436330143
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 439.9
+        }
+      ]
+    },
+    {
+      "path": "real/landscape/landscape_045_W3wgy9tDgto.jpg",
+      "sha256": "816d33ae29f80ac5a3827d584bbf8bdd5f782f94f00a734295fd15dcd2a9c92d",
+      "known_origin": "real",
+      "source_id": "real_landscape_landscape_045_W3wgy9tDgto.jpg",
+      "category": "landscape",
+      "generator": "",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/real/landscape/landscape_045_W3wgy9tDgto.jpg",
+      "license": "Unsplash License",
+      "evaluated_sha256": "816d33ae29f80ac5a3827d584bbf8bdd5f782f94f00a734295fd15dcd2a9c92d",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.5756195187568665,
+            "real": 0.42438048124313354
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 85.2
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.2419479330002457,
+            "real": 0.7580520669997544
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 424.6
+        }
+      ]
+    },
+    {
+      "path": "real/portrait/portrait_036_IHJtKBe9xNs.jpg",
+      "sha256": "acf816500cf2f553265306adb6bed265fb427d0f295c547ba9f21153ef09ea95",
+      "known_origin": "real",
+      "source_id": "real_portrait_portrait_036_IHJtKBe9xNs.jpg",
+      "category": "portrait",
+      "generator": "",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/real/portrait/portrait_036_IHJtKBe9xNs.jpg",
+      "license": "Unsplash License",
+      "evaluated_sha256": "acf816500cf2f553265306adb6bed265fb427d0f295c547ba9f21153ef09ea95",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.01723657175898552,
+            "real": 0.9827634282410145
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 169.9
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.06998916848995171,
+            "real": 0.9300108315100483
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 522.5
+        }
+      ]
+    },
+    {
+      "path": "real/product/product_034_VlgzxZZKQOQ.jpg",
+      "sha256": "d317ec46138ac5e58ea35e56dc97e35a3aabcbe0410162b9101d319d5d16c713",
+      "known_origin": "real",
+      "source_id": "real_product_product_034_VlgzxZZKQOQ.jpg",
+      "category": "product",
+      "generator": "",
+      "source_url": "https://github.com/AI-Detect-Arena/benchmark-dataset/blob/3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b/samples/real/product/product_034_VlgzxZZKQOQ.jpg",
+      "license": "Unsplash License",
+      "evaluated_sha256": "d317ec46138ac5e58ea35e56dc97e35a3aabcbe0410162b9101d319d5d16c713",
+      "image_format": "JPEG",
+      "models": [
+        {
+          "model_key": "v3_e2",
+          "status": "success",
+          "prediction": "fake",
+          "model_scores": {
+            "fake": 0.834516167640686,
+            "real": 0.16548383235931396
+          },
+          "model_id": "owner-trained-v3-e2",
+          "model_revision": "v3-e2-e560a8a20a84",
+          "ai_score_threshold": 0.5,
+          "elapsed_ms": 86.7
+        },
+        {
+          "model_key": "community_forensics",
+          "status": "success",
+          "prediction": "real",
+          "model_scores": {
+            "fake": 0.031490425179395196,
+            "real": 0.9685095748206048
+          },
+          "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "model_revision": "16db135220b318d811b207db576d90368980b595",
+          "ai_score_threshold": 0.65,
+          "elapsed_ms": 430.2
+        }
+      ]
+    }
+  ]
+}

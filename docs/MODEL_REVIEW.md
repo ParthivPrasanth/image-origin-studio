@@ -1,5 +1,7 @@
 # Model review after local failures
 
+This file records how Community Forensics became the app's external baseline. The later V3 E2 integration does not change this historical selection record. See [the dual-model comparison protocol](DUAL_MODEL_EVALUATION.md) for the rules governing any new head-to-head result.
+
 ## Why the current model is under review
 
 On 24 October 2026, the pinned `jacoballessio/ai-image-detect-distilled` model was run on a user folder with 9 files labeled `ai` and 6 labeled `real`. The labels are provisional: the precise origin of every file is unknown. Two `ai` files were byte-for-byte duplicates. The model called 5 of the 6 `real` files AI-generated and called both copies of the same `ai` image real. Hugging Face's reference pipeline reproduced two representative scores, so these errors are not caused by the app's label mapping or image processor.

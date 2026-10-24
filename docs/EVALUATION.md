@@ -1,5 +1,7 @@
 # Evaluation log
 
+This log records the original app model and the Community Forensics replacement. V3 E2 is the owner's separately trained model from the ML Project; its locked results and limitations are described there. See [the dual-model comparison protocol](DUAL_MODEL_EVALUATION.md) before making a head-to-head performance claim. The historical percentages here and in the V3 report came from different image sets.
+
 The current model has a small, separate screening comparison below. Its result is not a general accuracy claim. The 23 October check is historical evidence for the original model and was not used to select this replacement.
 
 ## Historical implementation smoke check on 23 October 2026

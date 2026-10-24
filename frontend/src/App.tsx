@@ -1,24 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 
-type Result = {
+const MODEL_KEYS = ["v3_e2", "community_forensics"] as const;
+type ModelKey = (typeof MODEL_KEYS)[number];
+type ModelSuccess = {
+  model_key: ModelKey;
+  status: "success";
   prediction: "fake" | "real";
   model_scores: { fake: number; real: number };
   model_id: string;
   model_revision: string;
   ai_score_threshold: number;
   elapsed_ms: number;
-  image_format: string;
 };
+type ModelFailure = { model_key: ModelKey; status: "error"; error: string };
+type ModelResult = ModelSuccess | ModelFailure;
+type ComparisonResponse = { image_format: string; models: ModelResult[] };
+type ComparisonResult = ComparisonResponse & { requestedModels: ModelKey[] };
 type Item = {
   id: string;
   file: File;
   preview: string;
   state: "ready" | "processing" | "done" | "error";
-  result?: Result;
+  result?: ComparisonResult;
+  runningModels?: ModelKey[];
   error?: string;
 };
 const MAX_FILES = 8;
 const MAX_BYTES = 10 * 1024 * 1024;
+const MODEL_INFO: Record<ModelKey, { name: string; credit: string }> = {
+  v3_e2: { name: "V3 E2", credit: "Owner-trained fusion model" },
+  community_forensics: {
+    name: "Community Forensics",
+    credit: "External baseline · Thermostatic",
+  },
+};
 
 function niceSize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
@@ -26,20 +41,46 @@ function niceSize(bytes: number) {
 function score(value: number) {
   return `${(value * 100).toFixed(1)}%`;
 }
-
-async function analyze(file: File): Promise<Result> {
+function modelName(key: ModelKey) {
+  return MODEL_INFO[key].name;
+}
+function resultFor(result: ComparisonResult, key: ModelKey) {
+  return result.models.find((entry) => entry.model_key === key);
+}
+function disagreement(result: ComparisonResult) {
+  const e2 = resultFor(result, "v3_e2");
+  const baseline = resultFor(result, "community_forensics");
+  return e2?.status === "success" && baseline?.status === "success"
+    ? e2.prediction !== baseline.prediction
+    : null;
+}
+async function analyze(
+  file: File,
+  models: readonly ModelKey[],
+): Promise<ComparisonResponse> {
   const form = new FormData();
   form.append("file", file);
-  const response = await fetch("/api/analyze", { method: "POST", body: form });
+  models.forEach((model) => form.append("models", model));
+  const response = await fetch("/api/analyze/compare", {
+    method: "POST",
+    body: form,
+  });
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.detail || `Request failed (${response.status})`);
+    throw new Error(
+      typeof body.detail === "string"
+        ? body.detail
+        : `Request failed (${response.status})`,
+    );
   }
   return response.json();
 }
 
 export default function App() {
   const [items, setItems] = useState<Item[]>([]);
+  const [selectedModels, setSelectedModels] = useState<ModelKey[]>([
+    ...MODEL_KEYS,
+  ]);
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
@@ -51,6 +92,17 @@ export default function App() {
     },
     [],
   );
+
+  function toggleModel(key: ModelKey) {
+    setSelectedModels((previous) => {
+      if (previous.includes(key)) {
+        return previous.length === 1
+          ? previous
+          : previous.filter((model) => model !== key);
+      }
+      return MODEL_KEYS.filter((model) => [...previous, key].includes(model));
+    });
+  }
 
   function addFiles(files: FileList | File[]) {
     const selected = Array.from(files);
@@ -70,11 +122,11 @@ export default function App() {
       }
       return true;
     });
-    if (selected.length > room)
+    if (selected.length > room) {
       setNotice(
         `Only the first ${room} files were added. The batch limit is ${MAX_FILES}.`,
       );
-    else if (accepted.length === selected.length) setNotice("");
+    } else if (accepted.length === selected.length) setNotice("");
     setItems((previous) => [
       ...previous,
       ...accepted.map((file) => ({
@@ -95,27 +147,61 @@ export default function App() {
     });
   }
 
-  async function run(ids: string[]) {
+  async function run(
+    ids: string[],
+    models: ModelKey[] = selectedModels,
+    merge = false,
+  ) {
     if (busy) return;
     setBusy(true);
+    const requested = [...models];
     for (const id of ids) {
       const item = itemsRef.current.find((candidate) => candidate.id === id);
       if (!item) continue;
       setItems((previous) =>
         previous.map((candidate) =>
           candidate.id === id
-            ? { ...candidate, state: "processing", error: undefined }
+            ? {
+                ...candidate,
+                state: "processing",
+                result: merge ? candidate.result : undefined,
+                error: undefined,
+                runningModels: requested,
+              }
             : candidate,
         ),
       );
       try {
-        const result = await analyze(item.file);
+        const response = await analyze(item.file, requested);
         setItems((previous) =>
-          previous.map((candidate) =>
-            candidate.id === id
-              ? { ...candidate, state: "done", result }
-              : candidate,
-          ),
+          previous.map((candidate) => {
+            if (candidate.id !== id) return candidate;
+            const prior = merge ? candidate.result : undefined;
+            const replaced = new Set(
+              response.models.map((entry) => entry.model_key),
+            );
+            const mergedModels = prior
+              ? [
+                  ...prior.models.filter(
+                    (entry) => !replaced.has(entry.model_key),
+                  ),
+                  ...response.models,
+                ]
+              : response.models;
+            return {
+              ...candidate,
+              state: "done",
+              error: undefined,
+              runningModels: undefined,
+              result: {
+                image_format: response.image_format,
+                models: MODEL_KEYS.flatMap((key) =>
+                  mergedModels.filter((entry) => entry.model_key === key),
+                ),
+                requestedModels: prior ? prior.requestedModels : requested,
+              },
+            };
+          }),
         );
       } catch (error) {
         setItems((previous) =>
@@ -136,31 +222,57 @@ export default function App() {
   }
 
   function exportCsv() {
+    const modelColumns = MODEL_KEYS.flatMap((key) => [
+      `${key}_status`,
+      `${key}_prediction`,
+      `${key}_fake_model_score`,
+      `${key}_real_model_score`,
+      `${key}_model_id`,
+      `${key}_model_revision`,
+      `${key}_ai_score_threshold`,
+      `${key}_elapsed_ms`,
+      `${key}_error`,
+    ]);
     const rows = [
       [
         "file",
-        "prediction",
-        "fake_model_score",
-        "real_model_score",
-        "model_id",
-        "model_revision",
-        "ai_score_threshold",
-        "elapsed_ms",
+        "requested_models",
+        "image_format",
+        "disagreement",
+        ...modelColumns,
       ],
       ...items
         .filter((item) => item.result)
-        .map((item) => [
-          item.file.name,
-          item.result!.prediction,
-          String(item.result!.model_scores.fake),
-          String(item.result!.model_scores.real),
-          item.result!.model_id,
-          item.result!.model_revision,
-          String(item.result!.ai_score_threshold),
-          String(item.result!.elapsed_ms),
-        ]),
+        .map((item) => {
+          const result = item.result!;
+          const modelValues = MODEL_KEYS.flatMap((key) => {
+            const entry = resultFor(result, key);
+            if (!entry) return Array(9).fill("") as string[];
+            if (entry.status === "error")
+              return ["error", "", "", "", "", "", "", "", entry.error];
+            return [
+              "success",
+              entry.prediction,
+              String(entry.model_scores.fake),
+              String(entry.model_scores.real),
+              entry.model_id,
+              entry.model_revision,
+              String(entry.ai_score_threshold),
+              String(entry.elapsed_ms),
+              "",
+            ];
+          });
+          const differs = disagreement(result);
+          return [
+            item.file.name,
+            result.requestedModels.join(" + "),
+            result.image_format,
+            differs === null ? "" : String(differs),
+            ...modelValues,
+          ];
+        }),
     ];
-    // Spreadsheet programs may treat a filename beginning with =, +, - or @ as a formula.
+    // Spreadsheet programs may treat a filename or error beginning with =, +, - or @ as a formula.
     const csv = rows
       .map((row) =>
         row
@@ -176,13 +288,14 @@ export default function App() {
     );
     const link = document.createElement("a");
     link.href = url;
-    link.download = "image-origin-results.csv";
+    link.download = "image-origin-comparison.csv";
     link.click();
     URL.revokeObjectURL(url);
   }
 
   const pending = items.filter(
-    (item) => item.state === "ready" || item.state === "error",
+    (item) =>
+      item.state === "ready" || (item.state === "error" && !item.result),
   );
   const completed = items.filter((item) => item.result);
   return (
@@ -199,11 +312,11 @@ export default function App() {
       <main>
         <section className="intro">
           <div className="eyebrow">IMAGE ANALYSIS / LOCAL DEMO</div>
-          <h1>Explore what the model sees.</h1>
+          <h1>Compare what two models see.</h1>
           <p>
-            Upload a photograph or generated image to inspect an experimental
-            model’s score. It made mistakes in a small dataset-labeled check, so
-            use its result as a clue, never proof of an image’s origin.
+            Run your trained V3 E2 model, an external Community Forensics
+            baseline, or both on the same images. Each result is an experimental
+            model suggestion, never proof of an image’s origin.
           </p>
         </section>
         <div className="workspace">
@@ -211,7 +324,7 @@ export default function App() {
             <div className="section-heading">
               <span className="step">01</span>
               <div>
-                <h2 id="upload-title">Choose images</h2>
+                <h2 id="upload-title">Choose images and models</h2>
                 <p>
                   JPEG, PNG, or WebP · up to 10 MB each · {MAX_FILES} per batch
                 </p>
@@ -253,6 +366,28 @@ export default function App() {
                 {notice}
               </p>
             )}
+            <fieldset className="model-selector" disabled={busy}>
+              <legend>Models for the next analysis</legend>
+              <p>Choose one or both. Both are selected by default.</p>
+              {MODEL_KEYS.map((key) => (
+                <label className="model-choice" key={key}>
+                  <input
+                    type="checkbox"
+                    checked={selectedModels.includes(key)}
+                    onChange={() => toggleModel(key)}
+                    aria-describedby={`${key}-credit`}
+                  />
+                  <span>
+                    <strong>{modelName(key)}</strong>
+                    <small id={`${key}-credit`}>{MODEL_INFO[key].credit}</small>
+                  </span>
+                </label>
+              ))}
+              <p className="selector-note">
+                At least one model stays selected. Changing this choice does not
+                change earlier results.
+              </p>
+            </fieldset>
             <div className="privacy-note">
               <span aria-hidden="true">◎</span>
               <p>
@@ -267,7 +402,9 @@ export default function App() {
               <span className="step">02</span>
               <div>
                 <h2 id="results-title">Review results</h2>
-                <p>Known origin and prediction should be checked separately.</p>
+                <p>
+                  Known origin and predictions should be checked separately.
+                </p>
               </div>
             </div>
             {items.length === 0 ? (
@@ -337,7 +474,8 @@ export default function App() {
                         )}
                         {item.state === "processing" && (
                           <p className="state processing" role="status">
-                            Analyzing image…
+                            Analyzing with{" "}
+                            {item.runningModels?.map(modelName).join(" and ")}…
                           </p>
                         )}
                         {item.state === "error" && (
@@ -346,58 +484,134 @@ export default function App() {
                             <button
                               className="text-button"
                               disabled={busy}
-                              onClick={() => run([item.id])}
+                              onClick={() =>
+                                run(
+                                  [item.id],
+                                  item.runningModels ?? selectedModels,
+                                  Boolean(item.result),
+                                )
+                              }
                             >
-                              Retry
+                              Retry request
                             </button>
                           </p>
                         )}
                         {item.result && (
                           <div className="analysis">
-                            <p
-                              className={`prediction ${item.result.prediction}`}
-                            >
-                              Experimental model suggests{" "}
-                              <strong>
-                                {item.result.prediction === "fake"
-                                  ? "AI-generated"
-                                  : "Real"}
-                              </strong>
+                            <p className="result-scope">
+                              Requested:{" "}
+                              {item.result.requestedModels
+                                .map(modelName)
+                                .join(" + ")}
                             </p>
-                            <div className="scores">
-                              <div>
-                                <span>AI-generated model score</span>
-                                <strong>
-                                  {score(item.result.model_scores.fake)}
-                                </strong>
-                                <meter
-                                  min="0"
-                                  max="1"
-                                  value={item.result.model_scores.fake}
-                                />
-                              </div>
-                              <div>
-                                <span>Complementary real score</span>
-                                <strong>
-                                  {score(item.result.model_scores.real)}
-                                </strong>
-                                <meter
-                                  min="0"
-                                  max="1"
-                                  value={item.result.model_scores.real}
-                                />
-                              </div>
+                            {disagreement(item.result) === true && (
+                              <p className="disagreement" role="status">
+                                The models disagree on this image. Check their
+                                separate scores and the image’s known origin if
+                                available.
+                              </p>
+                            )}
+                            <div className="model-results">
+                              {item.result.requestedModels.map((key) => {
+                                const entry = resultFor(item.result!, key);
+                                return (
+                                  <section
+                                    className="model-result"
+                                    key={key}
+                                    aria-label={`${modelName(key)} result`}
+                                  >
+                                    <div className="model-result-heading">
+                                      <div>
+                                        <h4>{modelName(key)}</h4>
+                                        <span>{MODEL_INFO[key].credit}</span>
+                                      </div>
+                                      {entry?.status === "success" && (
+                                        <span
+                                          className={`prediction ${entry.prediction}`}
+                                        >
+                                          Suggests{" "}
+                                          <strong>
+                                            {entry.prediction === "fake"
+                                              ? "AI-generated"
+                                              : "Real"}
+                                          </strong>
+                                        </span>
+                                      )}
+                                    </div>
+                                    {entry?.status === "error" && (
+                                      <p className="model-error" role="alert">
+                                        {entry.error}{" "}
+                                        <button
+                                          className="text-button"
+                                          disabled={busy}
+                                          onClick={() =>
+                                            run([item.id], [key], true)
+                                          }
+                                        >
+                                          Retry {modelName(key)}
+                                        </button>
+                                      </p>
+                                    )}
+                                    {!entry && (
+                                      <p className="model-error">
+                                        No result returned for this model.
+                                      </p>
+                                    )}
+                                    {entry?.status === "success" && (
+                                      <>
+                                        <div className="scores">
+                                          <div>
+                                            <span>
+                                              AI-generated model score
+                                            </span>
+                                            <strong>
+                                              {score(entry.model_scores.fake)}
+                                            </strong>
+                                            <meter
+                                              min="0"
+                                              max="1"
+                                              value={entry.model_scores.fake}
+                                            />
+                                          </div>
+                                          <div>
+                                            <span>Real model score</span>
+                                            <strong>
+                                              {score(entry.model_scores.real)}
+                                            </strong>
+                                            <meter
+                                              min="0"
+                                              max="1"
+                                              value={entry.model_scores.real}
+                                            />
+                                          </div>
+                                        </div>
+                                        <p className="result-meta">
+                                          AI flagging cutoff:{" "}
+                                          {score(entry.ai_score_threshold)} ·{" "}
+                                          {entry.elapsed_ms.toFixed(0)} ms
+                                        </p>
+                                        <p
+                                          className="result-meta model-identity"
+                                          title={entry.model_id}
+                                        >
+                                          Model: {entry.model_id} · revision{" "}
+                                          {entry.model_revision}
+                                        </p>
+                                      </>
+                                    )}
+                                  </section>
+                                );
+                              })}
                             </div>
-                            <p className="result-meta">
-                              AI flagging cutoff:{" "}
-                              {score(item.result.ai_score_threshold)}. Scores
-                              are estimates, not certainty.
-                            </p>
-                            <p className="result-meta">
-                              Model revision{" "}
-                              {item.result.model_revision.slice(0, 8)} ·{" "}
-                              {item.result.elapsed_ms.toFixed(0)} ms
-                            </p>
+                            <div className="reanalyze">
+                              <button
+                                className="text-button"
+                                disabled={busy}
+                                onClick={() => run([item.id])}
+                              >
+                                Analyze again with current selection
+                              </button>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -409,26 +623,29 @@ export default function App() {
           </section>
         </div>
         <aside className="about">
-          <div className="eyebrow">HOW TO READ A RESULT</div>
-          <h2>A score is not a verdict.</h2>
+          <div className="eyebrow">HOW TO READ A COMPARISON</div>
+          <h2>Two scores are not a verdict.</h2>
           <p>
-            The AI score is calibrated on the model author’s development data;
-            the real score is its complement. The published 65% cutoff decides
-            the label. A high score can still be wrong, especially for
-            unfamiliar generators, edits, or images unlike its training data.
+            V3 E2 is the owner’s trained fusion model using FFT features and a
+            frozen pretrained MobileNetV3 backbone. Community Forensics is an
+            external baseline by Thermostatic. Each model uses its own
+            preprocessing and decision cutoff. Their scores are not calibrated
+            to each other, so a larger number from one model does not mean
+            stronger evidence than a smaller number from the other.
           </p>
           <p>
-            Model:{" "}
+            Both models can be wrong, including when they agree. Disagreement is
+            useful to inspect, but neither result proves how an image was made.
+            Community Forensics is credited at{" "}
             <a
               href="https://huggingface.co/Thermostatic/community-forensics-frontier-detector-2026-08"
               target="_blank"
               rel="noreferrer"
             >
-              Thermostatic/community-forensics-frontier-detector-2026-08
+              its model page
             </a>
-            . In one separate 60-image check, this app got 25 of 30 real and 26
-            of 30 fully generated images right. That small sample does not
-            predict performance on your uploads.
+            . A fair head-to-head evaluation on independently sourced,
+            known-origin images remains to be done.
           </p>
         </aside>
       </main>
