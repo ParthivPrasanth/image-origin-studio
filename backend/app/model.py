@@ -20,6 +20,7 @@ CALIBRATION_INTERCEPT = -0.7403357915937764
 SCORE_THRESHOLD = 0.65
 IMAGE_MEAN = np.asarray([0.485, 0.456, 0.406], dtype=np.float32)
 IMAGE_STD = np.asarray([0.229, 0.224, 0.225], dtype=np.float32)
+PREPROCESSING_RECIPE = "community-forensics-rgb-440-bicubic-center384-imagenet-v1"
 
 
 @dataclass(frozen=True)
@@ -29,8 +30,8 @@ class Scores:
     real: float
 
 
-def preprocess(image_bytes: bytes) -> np.ndarray:
-    """Apply the model card's RGB, 440-short-edge, center-crop preprocessing."""
+def input_view(image_bytes: bytes) -> Image.Image:
+    """Return exact RGB pixels immediately before tensor normalization."""
     with Image.open(BytesIO(image_bytes)) as source:
         image = ImageOps.exif_transpose(source).convert("RGB")
     width, height = image.size
@@ -41,7 +42,12 @@ def preprocess(image_bytes: bytes) -> np.ndarray:
     image = image.resize((resized_width, resized_height), Image.Resampling.BICUBIC)
     left = round((resized_width - 384) / 2)
     top = round((resized_height - 384) / 2)
-    image = image.crop((left, top, left + 384, top + 384))
+    return image.crop((left, top, left + 384, top + 384))
+
+
+def preprocess(image_bytes: bytes) -> np.ndarray:
+    """Apply the model card's RGB, 440-short-edge, center-crop preprocessing."""
+    image = input_view(image_bytes)
     pixels = np.asarray(image, dtype=np.float32) / 255.0
     normalized = (pixels - IMAGE_MEAN) / IMAGE_STD
     return np.ascontiguousarray(np.transpose(normalized, (2, 0, 1))[None, ...])

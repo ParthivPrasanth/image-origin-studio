@@ -5,3 +5,10 @@
 *.css text eol=lf
 *.md text eol=lf
 *.json text eol=lf
+*.pem text eol=lf
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.wasm binary

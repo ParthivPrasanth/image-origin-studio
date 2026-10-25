@@ -1,0 +1,290 @@
+{
+  "status": "local-review-draft",
+  "purpose": "Curated source-documented product examples; not an accuracy sample",
+  "cases": [
+    {
+      "id": "traffic-lights",
+      "title": "Traffic lights",
+      "assetUrl": "/gallery/candidates/cocoxgen-000000558558-sdxl-short-display.jpg",
+      "origin": "ai_generated",
+      "sourcePage": "https://huggingface.co/datasets/heikeadel/cocoxgen",
+      "sourceName": "COCOXGEN: 558558-short-sdxl.jpg",
+      "attribution": "COCOXGEN by Philipp Moeßner and Heike Adel; generated with SDXL. Display copy resized and re-encoded.",
+      "originEvidence": "The public COCOXGEN dataset identifies this file as an SDXL generated image. Dataset revision c336ad1; source SHA-256 a656e67b7e926f5187078af3220de4c6209204133541baca360e3fcc7a64a876.",
+      "rights": "COCOXGEN dataset license: Creative Commons Attribution 4.0 International.",
+      "rightsUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "edits": "Source image was EXIF-oriented, converted to RGB, resized to fit 1200 × 1200 with Lanczos, then re-encoded JPEG quality 88; no crop or retouch.",
+      "sha256": "353664928a2f9db88c1ff591f4f14adda1750f6bb981ad2f58a9cb007762134e",
+      "modelRuns": [
+        {
+          "modelKey": "v3_e2",
+          "modelId": "owner-trained-v3-e2",
+          "modelRevision": "v3-e2-e560a8a20a84",
+          "preprocessingRecipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+          "prediction": "fake",
+          "aiScore": 0.9802901148796082,
+          "threshold": 0.5,
+          "analyzedAt": "2026-10-25T06:32:38.497456+00:00"
+        },
+        {
+          "modelKey": "community_forensics",
+          "modelId": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "modelRevision": "16db135220b318d811b207db576d90368980b595",
+          "preprocessingRecipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+          "prediction": "fake",
+          "aiScore": 0.9999944362642136,
+          "threshold": 0.65,
+          "analyzedAt": "2026-10-25T06:32:38.497456+00:00"
+        }
+      ]
+    },
+    {
+      "id": "waterfall",
+      "title": "Forest waterfall",
+      "assetUrl": "/gallery/candidates/waterfall-display.jpg",
+      "origin": "camera_photo",
+      "sourcePage": "https://www.usgs.gov/media/images/waterfall-appalachian-forest",
+      "sourceName": "USGS: Waterfall in Appalachian Forest",
+      "attribution": "Samuel H Austin / U.S. Geological Survey.",
+      "originEvidence": "The linked USGS photography record identifies the scene and marks the image Public Domain. This is an institutional source record, not an independent check of camera RAW.",
+      "rights": "Individual USGS source page marks this photograph Public Domain.",
+      "edits": "Acquired USGS JPEG copy was EXIF-oriented, converted to RGB, resized to fit 1200 × 1200 with Lanczos, and re-encoded JPEG quality 88; no crop or retouch.",
+      "sha256": "e6409a3f92436161989061930819a0442caa52eeee05d4a91e3d3dc3fe01aa9b",
+      "modelRuns": [
+        {
+          "modelKey": "v3_e2",
+          "modelId": "owner-trained-v3-e2",
+          "modelRevision": "v3-e2-e560a8a20a84",
+          "preprocessingRecipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+          "prediction": "real",
+          "aiScore": 0.00076858582906425,
+          "threshold": 0.5,
+          "analyzedAt": "2026-10-25T05:52:32.098491+00:00"
+        },
+        {
+          "modelKey": "community_forensics",
+          "modelId": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "modelRevision": "16db135220b318d811b207db576d90368980b595",
+          "preprocessingRecipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+          "prediction": "real",
+          "aiScore": 6.082061509680587e-06,
+          "threshold": 0.65,
+          "analyzedAt": "2026-10-25T05:52:32.098491+00:00"
+        }
+      ]
+    },
+    {
+      "id": "skier",
+      "title": "Skier in snow",
+      "assetUrl": "/gallery/candidates/cocoxgen-000000445602-sdxl-long-display.jpg",
+      "origin": "ai_generated",
+      "sourcePage": "https://huggingface.co/datasets/heikeadel/cocoxgen",
+      "sourceName": "COCOXGEN: 445602-long-sdxl.jpg",
+      "attribution": "COCOXGEN by Philipp Moeßner and Heike Adel; generated with SDXL. Display copy resized and re-encoded.",
+      "originEvidence": "The public COCOXGEN dataset identifies this file as an SDXL generated image. Dataset revision c336ad1; source SHA-256 e8cb1e706aac0f44c34c1b8a01b406c588caf1ee62d97214f1ede8dca1351590.",
+      "rights": "COCOXGEN dataset license: Creative Commons Attribution 4.0 International.",
+      "rightsUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "edits": "Source image was EXIF-oriented, converted to RGB, resized to fit 1200 × 1200 with Lanczos, then re-encoded JPEG quality 88; no crop or retouch.",
+      "sha256": "fafe941ef72614a14cda8afee53d486ae4333bd05a51da193b9bb010f8bbd241",
+      "modelRuns": [
+        {
+          "modelKey": "v3_e2",
+          "modelId": "owner-trained-v3-e2",
+          "modelRevision": "v3-e2-e560a8a20a84",
+          "preprocessingRecipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+          "prediction": "fake",
+          "aiScore": 0.9967523813247681,
+          "threshold": 0.5,
+          "analyzedAt": "2026-10-25T06:32:43.609011+00:00"
+        },
+        {
+          "modelKey": "community_forensics",
+          "modelId": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "modelRevision": "16db135220b318d811b207db576d90368980b595",
+          "preprocessingRecipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+          "prediction": "fake",
+          "aiScore": 0.9999997955235108,
+          "threshold": 0.65,
+          "analyzedAt": "2026-10-25T06:32:43.609011+00:00"
+        }
+      ]
+    },
+    {
+      "id": "bird",
+      "title": "Bird among leaves",
+      "assetUrl": "/gallery/candidates/bird-display.jpg",
+      "origin": "camera_photo",
+      "sourcePage": "https://www.usgs.gov/media/images/sitting-pretty",
+      "sourceName": "USGS: Sitting Pretty",
+      "attribution": "Amy Tolcin / U.S. Geological Survey.",
+      "originEvidence": "The linked USGS photography record identifies the scene and marks the image Public Domain. This is an institutional source record, not an independent check of camera RAW.",
+      "rights": "Individual USGS source page marks this photograph Public Domain.",
+      "edits": "Acquired USGS JPEG copy was EXIF-oriented, converted to RGB, resized to fit 1200 × 1200 with Lanczos, and re-encoded JPEG quality 88; no crop or retouch.",
+      "sha256": "e2dc4f164ebdf067fbb4fee1c70c5f8afdbf65b4990cdcf990e4a3e2748fbe9d",
+      "modelRuns": [
+        {
+          "modelKey": "v3_e2",
+          "modelId": "owner-trained-v3-e2",
+          "modelRevision": "v3-e2-e560a8a20a84",
+          "preprocessingRecipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+          "prediction": "real",
+          "aiScore": 0.0007896334282122552,
+          "threshold": 0.5,
+          "analyzedAt": "2026-10-25T05:52:37.596558+00:00"
+        },
+        {
+          "modelKey": "community_forensics",
+          "modelId": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "modelRevision": "16db135220b318d811b207db576d90368980b595",
+          "preprocessingRecipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+          "prediction": "real",
+          "aiScore": 5.605821573109576e-05,
+          "threshold": 0.65,
+          "analyzedAt": "2026-10-25T05:52:37.596558+00:00"
+        }
+      ]
+    },
+    {
+      "id": "bananas",
+      "title": "Bananas on a chair",
+      "assetUrl": "/gallery/candidates/cocoxgen-000000279769-sdxl-short-display.jpg",
+      "origin": "ai_generated",
+      "sourcePage": "https://huggingface.co/datasets/heikeadel/cocoxgen",
+      "sourceName": "COCOXGEN: 279769-short-sdxl.jpg",
+      "attribution": "COCOXGEN by Philipp Moeßner and Heike Adel; generated with SDXL. Display copy resized and re-encoded.",
+      "originEvidence": "The public COCOXGEN dataset identifies this file as an SDXL generated image. Dataset revision c336ad1; source SHA-256 7543827a74ad57bd78dbbeccc67ad262c634134fec50ba6c6858d17e1413964d.",
+      "rights": "COCOXGEN dataset license: Creative Commons Attribution 4.0 International.",
+      "rightsUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "edits": "Source image was EXIF-oriented, converted to RGB, resized to fit 1200 × 1200 with Lanczos, then re-encoded JPEG quality 88; no crop or retouch.",
+      "sha256": "29655a2a0a5acc904d57f4da69e03a3e1a2fd4b3cc77c5f691f9548aff08898f",
+      "modelRuns": [
+        {
+          "modelKey": "v3_e2",
+          "modelId": "owner-trained-v3-e2",
+          "modelRevision": "v3-e2-e560a8a20a84",
+          "preprocessingRecipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+          "prediction": "fake",
+          "aiScore": 0.9999748468399048,
+          "threshold": 0.5,
+          "analyzedAt": "2026-10-25T06:32:44.668078+00:00"
+        },
+        {
+          "modelKey": "community_forensics",
+          "modelId": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "modelRevision": "16db135220b318d811b207db576d90368980b595",
+          "preprocessingRecipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+          "prediction": "fake",
+          "aiScore": 0.9999882819433318,
+          "threshold": 0.65,
+          "analyzedAt": "2026-10-25T06:32:44.668078+00:00"
+        }
+      ]
+    },
+    {
+      "id": "dunes",
+      "title": "Desert dunes",
+      "assetUrl": "/gallery/candidates/dunes-display.jpg",
+      "origin": "camera_photo",
+      "sourcePage": "https://www.usgs.gov/media/images/desert-sand-dunes",
+      "sourceName": "USGS: Desert sand dunes",
+      "attribution": "Pacific Coastal and Marine Science Center / U.S. Geological Survey; individual photographer not listed.",
+      "originEvidence": "The linked USGS photography record identifies the scene and marks the image Public Domain. This is an institutional source record, not an independent check of camera RAW.",
+      "rights": "Individual USGS source page marks this photograph Public Domain.",
+      "edits": "Acquired USGS JPEG copy was EXIF-oriented, converted to RGB, resized to fit 1200 × 1200 with Lanczos, and re-encoded JPEG quality 88; no crop or retouch.",
+      "sha256": "a5cdf0e8ce5eaa6e0c6dd35853a460d36d5426cdce644f6b5c81b53826637c46",
+      "modelRuns": [
+        {
+          "modelKey": "v3_e2",
+          "modelId": "owner-trained-v3-e2",
+          "modelRevision": "v3-e2-e560a8a20a84",
+          "preprocessingRecipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+          "prediction": "real",
+          "aiScore": 0.2881304919719696,
+          "threshold": 0.5,
+          "analyzedAt": "2026-10-25T05:52:37.890126+00:00"
+        },
+        {
+          "modelKey": "community_forensics",
+          "modelId": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "modelRevision": "16db135220b318d811b207db576d90368980b595",
+          "preprocessingRecipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+          "prediction": "real",
+          "aiScore": 0.00040403741254295433,
+          "threshold": 0.65,
+          "analyzedAt": "2026-10-25T05:52:37.890126+00:00"
+        }
+      ]
+    },
+    {
+      "id": "tennis-player",
+      "title": "Tennis player",
+      "assetUrl": "/gallery/candidates/cocoxgen-000000019432-fooocus-long-display.jpg",
+      "origin": "ai_generated",
+      "sourcePage": "https://huggingface.co/datasets/heikeadel/cocoxgen",
+      "sourceName": "COCOXGEN: 19432-long-fooocus.png",
+      "attribution": "COCOXGEN by Philipp Moeßner and Heike Adel; generated with Fooocus. Display copy resized and re-encoded.",
+      "originEvidence": "The public COCOXGEN dataset identifies this file as an Fooocus generated image. Dataset revision c336ad1; source SHA-256 67aa4363af27281c6344fefa13251d2ea13071ab9d5a40be7d06e0ffbdb2cd2c.",
+      "rights": "COCOXGEN dataset license: Creative Commons Attribution 4.0 International.",
+      "rightsUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "edits": "Source image was EXIF-oriented, converted to RGB, resized to fit 1200 × 1200 with Lanczos, then re-encoded JPEG quality 88; no crop or retouch.",
+      "sha256": "54c9f5bd085fe61b391e7cd3d5f2ef99e89d8da8f35bcba3f4d01aa8b9520cd8",
+      "modelRuns": [
+        {
+          "modelKey": "v3_e2",
+          "modelId": "owner-trained-v3-e2",
+          "modelRevision": "v3-e2-e560a8a20a84",
+          "preprocessingRecipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+          "prediction": "real",
+          "aiScore": 0.44861850142478943,
+          "threshold": 0.5,
+          "analyzedAt": "2026-10-25T06:32:43.355849+00:00"
+        },
+        {
+          "modelKey": "community_forensics",
+          "modelId": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "modelRevision": "16db135220b318d811b207db576d90368980b595",
+          "preprocessingRecipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+          "prediction": "fake",
+          "aiScore": 0.999991173142023,
+          "threshold": 0.65,
+          "analyzedAt": "2026-10-25T06:32:43.355849+00:00"
+        }
+      ]
+    },
+    {
+      "id": "bridge",
+      "title": "Bridge over river",
+      "assetUrl": "/gallery/candidates/bridge-display.jpg",
+      "origin": "camera_photo",
+      "sourcePage": "https://www.usgs.gov/media/images/key-bridge",
+      "sourceName": "USGS: Key Bridge",
+      "attribution": "Office of Communications / U.S. Geological Survey; individual photographer not listed on current page.",
+      "originEvidence": "The linked USGS photography record identifies the scene and marks the image Public Domain. This is an institutional source record, not an independent check of camera RAW.",
+      "rights": "Individual USGS source page marks this photograph Public Domain.",
+      "edits": "Acquired USGS JPEG copy was EXIF-oriented, converted to RGB, resized to fit 1200 × 1200 with Lanczos, and re-encoded JPEG quality 88; no crop or retouch.",
+      "sha256": "504cd9eda877c0722469c06a7e75368d0e1d9fee706d21485631d9bde67bba14",
+      "modelRuns": [
+        {
+          "modelKey": "v3_e2",
+          "modelId": "owner-trained-v3-e2",
+          "modelRevision": "v3-e2-e560a8a20a84",
+          "preprocessingRecipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+          "prediction": "real",
+          "aiScore": 0.001652581267990172,
+          "threshold": 0.5,
+          "analyzedAt": "2026-10-25T05:52:38.333526+00:00"
+        },
+        {
+          "modelKey": "community_forensics",
+          "modelId": "Thermostatic/community-forensics-frontier-detector-2026-08",
+          "modelRevision": "16db135220b318d811b207db576d90368980b595",
+          "preprocessingRecipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+          "prediction": "real",
+          "aiScore": 0.00046999761260272933,
+          "threshold": 0.65,
+          "analyzedAt": "2026-10-25T05:52:38.333526+00:00"
+        }
+      ]
+    }
+  ]
+}

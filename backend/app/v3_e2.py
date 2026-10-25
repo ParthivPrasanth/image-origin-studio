@@ -26,6 +26,8 @@ from .model import Scores
 MODEL_ID = "owner-trained-v3-e2"
 MODEL_REVISION = "v3-e2-e560a8a20a84"
 SCORE_THRESHOLD = 0.5
+FFT_RECIPE = "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1"
+MOBILE_RECIPE = "v3-e2-square224-mobile-v3-small-imagenet1k-v1"
 ARTIFACT_SHA256 = "7b18530b038cac4332095b00bf04690e91c79c15d0ae9acfe32d22187852fa5c"
 MOBILE_WEIGHT_SHA256 = "047dcff4addef86ea5bc2eff13c9614dc11f47ab1160d0a71a25e7db994f4e1f"
 MOBILE_WEIGHT_URL = "https://download.pytorch.org/models/mobilenet_v3_small-047dcff4.pth"
@@ -79,6 +81,31 @@ def image_view(image_bytes: bytes) -> Image.Image:
     return rgb.crop((left, top, left + side, top + side)).resize(
         (224, 224), Image.Resampling.LANCZOS
     )
+
+
+def mobile_input_view(image: Image.Image, transform=None) -> Image.Image:
+    """Show the MobileNet RGB pixels before tensor conversion/normalization."""
+    from torchvision.models import MobileNet_V3_Small_Weights
+    from torchvision.transforms import functional as F
+
+    preset = transform or MobileNet_V3_Small_Weights.IMAGENET1K_V1.transforms()
+    resized = F.resize(
+        image.convert("RGB"), preset.resize_size,
+        interpolation=preset.interpolation, antialias=preset.antialias,
+    )
+    return F.center_crop(resized, preset.crop_size)
+
+
+def mobile_input_tensor(image: Image.Image, transform=None):
+    """Use the same display view for the model tensor, then preset normalization."""
+    import torch
+    from torchvision.models import MobileNet_V3_Small_Weights
+    from torchvision.transforms import functional as F
+
+    preset = transform or MobileNet_V3_Small_Weights.IMAGENET1K_V1.transforms()
+    view = mobile_input_view(image, preset)
+    tensor = F.convert_image_dtype(F.pil_to_tensor(view), dtype=torch.float)
+    return F.normalize(tensor, mean=preset.mean, std=preset.std)
 
 
 @lru_cache(maxsize=1)
@@ -192,7 +219,7 @@ class E2Detector:
     def _spatial_features(self, image: Image.Image) -> np.ndarray:
         import torch
 
-        pixels = self.transform(image.convert("RGB")).unsqueeze(0)
+        pixels = mobile_input_tensor(image, self.transform).unsqueeze(0)
         with torch.inference_mode():
             x = pixels
             pooled = []

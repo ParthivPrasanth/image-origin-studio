@@ -1,3 +1,4 @@
+import hashlib
 from io import BytesIO
 
 from fastapi.testclient import TestClient
@@ -47,6 +48,10 @@ def test_both_models_return_separate_scores_and_revisions(monkeypatch):
     assert response.status_code == 200
     body = response.json()
     assert body["image_format"] == "PNG"
+    assert body["input"]["sha256"] == hashlib.sha256(png()).hexdigest()
+    assert body["input"]["width"] == 16
+    assert body["input"]["height"] == 16
+    assert body["analyzed_at"].endswith("+00:00")
     assert [result["model_key"] for result in body["models"]] == [
         "v3_e2", "community_forensics"
     ]
@@ -56,6 +61,7 @@ def test_both_models_return_separate_scores_and_revisions(monkeypatch):
         E2_REVISION, MODEL_REVISION
     ]
     assert [result["ai_score_threshold"] for result in body["models"]] == [0.5, 0.65]
+    assert all(result["preprocessing_recipe"] for result in body["models"])
 
 
 def test_single_model_selection_does_not_load_the_other(monkeypatch):
@@ -76,6 +82,10 @@ def test_model_failure_preserves_other_result_and_hides_exception(monkeypatch):
     failures, success = response.json()["models"]
     assert failures["model_key"] == "v3_e2"
     assert failures["status"] == "error"
+    assert failures["model_id"]
+    assert failures["model_revision"] == E2_REVISION
+    assert failures["ai_score_threshold"] == 0.5
+    assert failures["preprocessing_recipe"]
     assert "Private inference error" not in failures["error"]
     assert success["status"] == "success"
 

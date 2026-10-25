@@ -11,20 +11,21 @@ This file records the working agreement for this repository. Follow the user's c
 - Keep the owner informed as work progresses, including decisions, completed changes, failed checks, and the next step.
 - Keep documentation organized and understandable so the owner can learn how the project works and future work can build on it.
 
-## Current snapshot (24 October 2026)
+## Current snapshot (25 October 2026)
 
 - The local app uses React/TypeScript in `frontend/` and FastAPI in `backend/`. It offers the owner's locked V3 E2 model and the pinned Community Forensics external baseline, individually or side by side. Keep their preprocessing and thresholds separate. See `backend/app/v3_e2.py` and `backend/app/model.py` for authoritative inference details.
 - V3 E2 comes from the separate, read-only ML Project. Package inference-only artifacts with hashes; never depend on that sibling folder at runtime or alter its training, lock, or final-test evidence. The pretrained MobileNetV3 backbone is frozen; the owner trained the fusion head. See `docs/DUAL_MODEL_EVALUATION.md` for claim boundaries.
 - The first app model, `jacoballessio/ai-image-detect-distilled`, made clear errors on the owner's test folder. `Thermostatic/community-forensics-frontier-detector-2026-08` replaced it and now serves as the external baseline. Its selection protocol and results are recorded in `docs/MODEL_REVIEW.md` and `docs/EVALUATION.md`.
-- Single and batch uploads, previews, per-model results and errors, retry, and CSV export work locally. Uploads and results are temporary. The sample gallery, accounts, durable history, background workers, and cloud deployment are future work.
+- Single and batch uploads, previews, per-model results and errors, retry, CSV export, the on-demand input-view inspector, and per-image JSON/print-friendly case reports work locally. A separate on-demand C2PA browser prototype reads original file bytes and keeps credential claims distinct from model suggestions; see `docs/C2PA_FEASIBILITY.md` for verified and missing states. A source-documented eight-case gallery works as a **local review draft**; the owner must approve its exact cases, labels, and reveal wording before public deployment. Guest and unsaved analyses remain temporary. Optional private history is implemented for localhost test identities only, behind `IOS_LOCAL_TEST_AUTH=1`; see `docs/HISTORY_LOCAL_VERIFICATION_2026-10-25.md`. Production accounts, background workers, and cloud deployment are future work.
 - `README.md` is the entry point for setup and current limits. `docs/DEPLOYMENT.md` explains the staged cloud path; `docs/WIREFRAMES.md` records the screen plan. Check the actual code before repeating this snapshot in a user-facing claim.
 - `docs/PRODUCT_OPPORTUNITIES.md` is a researched proposal, not an implemented feature list. Review the first vertical slice with the owner before changing product direction.
 
 ## How to work with the owner
 
 - Make concrete, reviewable progress on authorized work. For a major change in model, product direction, data retention, or hosting, explain the evidence and tradeoffs and involve the owner in the decision. Routine implementation and reversible fixes can proceed directly.
+- Favor practical, presentation-aware choices and fast iteration. Use reasonable workarounds and curate clear examples that show the product well; do not turn every small product decision into a research protocol or delay implementation for nonessential perfection.
 - Keep the repository organized: put API code and tests in `backend/`, UI code in `frontend/`, repeatable scripts in `scripts/`, and durable explanations or evidence in `docs/`. Prefer focused changes over new frameworks or services without a demonstrated need.
-- Use restrained, purposeful UI design. Review real screens at phone, tablet, and desktop widths, plus keyboard, loading, empty, error, and incorrect-prediction states. Avoid decorative metrics or claims the product cannot support.
+- Use restrained, purposeful UI design. Review real screens at phone, tablet, and desktop widths, plus keyboard, loading, empty, error, and incorrect-prediction states.
 - When reporting progress, separate what is implemented, what was measured, and what is planned. State failures and unfinished gates plainly.
 
 ## Model and evaluation rules
@@ -40,7 +41,7 @@ This file records the working agreement for this repository. Follow the user's c
 ## Privacy, cloud, and release gates
 
 - Keep local images, manifests, diagnostic outputs, model downloads, virtual environments, and secrets out of Git. The ignored `.local/`, `model-cache/`, and `.venv/` directories are for local work; inspect changes before committing.
-- Before storing user uploads or account history, define ownership, private access, deletion, and retention behavior and test them. Before public exposure, address request limits, authentication where needed, and failure handling. The current localhost API is not a production service.
+- Local opted-in storage has ownership, private access, deletion, and retention checks; review them again for the production identity and file store. Before public exposure, address request limits, hosted authentication, and failure handling. The current localhost API is not a production service.
 - Measure cold load, peak memory, and inference time for each model and both loaded together before choosing the AWS compute service or changing the provisional batch limit. Explain the architecture in beginner-friendly terms and show how to run, monitor, and stop it.
 - Plan the AWS path around private image storage, an API, background processing if measurements justify it, a result store, and logs. S3, SQS, a model worker, DynamoDB, and CloudWatch are candidates from the synopsis, not commitments to deploy every service. Select the exact AWS services, region, and image retention rules from measured requirements.
 - Build AWS documentation alongside implementation: account and permission prerequisites, what each service does, reproducible setup or infrastructure code, verification steps, expected charges, monitoring, and exact teardown steps. Keep credentials and account identifiers out of the repository.

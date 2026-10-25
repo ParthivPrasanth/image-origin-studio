@@ -1,7 +1,10 @@
 # Making Image Origin Studio more useful and distinctive
 
-Research and product direction, 24 October 2026. These are **proposals**, not
-features implemented in the current app. The local comparison works, while
+Research and product direction, 24 October 2026. This is a historical idea
+list, not the current feature status. The inspector, case report, C2PA panel,
+gallery draft, and optional localhost history were later implemented; the
+robustness lab was skipped by the owner. See the [current milestone table](NEXT_IMPLEMENTATION_PLAN.md).
+The local comparison works, while
 the [public paired pilot](PUBLIC_PILOT_2026-10-24.md) exposed V3 E2 mistakes
 on unfamiliar sources. The strongest direction is an **evidence workbench**:
 help a person understand the image, the two model suggestions, and the limits
@@ -12,18 +15,17 @@ visible without promising that an AI detector can prove origin.
 
 | Priority | Idea | What the user experiences | Why it adds value | Scope |
 | --- | --- | --- | --- | --- |
-| 1 | **Case report and input-view inspector** | After upload, inspect the exact crop/resize each model received, then download a local report with image hash, model versions, thresholds, scores, errors, and caveats. | Makes the model pipeline understandable and the result reproducible. Avoid calling crop previews explanations of model reasoning. | Medium |
-| 2 | **Known-origin challenge gallery** | Guess whether a licensed example is camera-made or generated, reveal its documented source, then see both model suggestions and their mistakes. Filter for disagreements and false alarms. | An engaging demonstration that teaches why a detector can fail. It also gives the UI a useful state before a visitor uploads private images. | Medium; needs carefully licensed and checked examples |
-| 3 | **Robustness lab** | On one uploaded image, try declared JPEG, resize, and crop variants. Show how each model's score and decision change in a small chart. Keep the original beside the transformed view. | Transformation sensitivity is a real research problem; making it visible is more honest and interesting than another confidence gauge. | Medium to high; needs limits on CPU work |
-| 4 | **Provenance panel** | Check for a verifiable C2PA Content Credential, show issuer/actions and validation state, and keep it separate from the two model scores. Show “no credential found” as unknown. | Adds an independent kind of evidence and a clear lesson about provenance versus statistical screening. | Medium; validate SDK, supported formats, and privacy behavior first |
+| 1 | **Case report and input-view inspector** | After upload, inspect the exact crop/resize each model received, then download a local report with image hash, model versions, thresholds, scores, errors, and caveats. | Makes the model pipeline understandable and the result reproducible. Avoid calling crop previews explanations of model reasoning. | Implemented locally |
+| 2 | **Known-origin challenge gallery** | Guess whether a licensed example is camera-made or generated, reveal its documented source, then see both model suggestions and their mistakes. Filter for disagreements and false alarms. | An engaging demonstration that teaches why a detector can fail. It also gives the UI a useful state before a visitor uploads private images. | Local draft; owner publication review remains |
+| 3 | **Robustness lab** | On one uploaded image, try declared JPEG, resize, and crop variants. Show how each model's score and decision change in a small chart. Keep the original beside the transformed view. | Transformation sensitivity is a real research problem; making it visible is more honest and interesting than another confidence gauge. | Skipped by owner |
+| 4 | **Provenance panel** | Check for a verifiable C2PA Content Credential, show issuer/actions and validation state, and keep it separate from the two model scores. Show “no credential found” as unknown. | Adds an independent kind of evidence and a clear lesson about provenance versus statistical screening. | Local prototype; remaining checks recorded separately |
 | 5 | **Evaluation observatory** | A public page for dated, frozen evaluation runs with source mix, confusion counts, false alarms, subgroup slices, and a browsable failure gallery. | Supports a defensible resume story and makes limitations easy to inspect. | Medium after a larger independent set |
 | 6 | **AWS job workflow** | Larger batches become jobs with progress, retries, private deletion controls, and a clear completion receipt. | Demonstrates production engineering, but host choice and cost must follow measured memory and runtime. | High; later release |
 
-The first three could form one coherent **Image Origin Lab** screen: results,
-what each model saw, and what happens when the image is transformed. A case
-report would capture the exact experiment. The gallery could be a separate
-guided route. Build one vertical slice at a time and test it on desktop,
-phone, keyboard, and slow/error states.
+The earlier combined **Image Origin Lab** screen was not adopted. The current
+app has separate Analyze, Gallery, and History views, with the inspector and
+report actions inside Analyze. History saves only when a local test user opts
+in before analysis.
 
 ## Research behind the choices
 
@@ -59,18 +61,18 @@ phone, keyboard, and slow/error states.
 
 ## Decisions and gates
 
-1. **Choose the first vertical slice.** I recommend the case report and
-   input-view inspector. It uses the current app, is directly useful during
-   the larger evaluation, and can be checked without collecting accounts or
-   storing uploads.
+1. **First vertical slice completed locally.** The case report and input-view
+   inspector are in the current app. The opt-in local history slice was added
+   later with ownership, 30-day retention, and deletion checks; see
+   [local verification](HISTORY_LOCAL_VERIFICATION_2026-10-25.md).
 2. **Build the gallery from independently checked examples.** The current
    12-image public pilot is too narrow to present as a general challenge.
    Record individual licenses, source pages, hashes, and known origins;
    show incorrect predictions rather than selecting flattering examples.
-3. **Keep experimentation separate from verdicts.** The robustness lab
-   should show score changes for declared transformations. It should not
-   silently retune thresholds, use user uploads for training, or generate a
-   stronger-looking combined score.
+3. **Keep experimentation separate from verdicts.** The owner skipped the
+   optional robustness lab. If reconsidered, it should show score changes for
+   declared transformations without silently retuning thresholds or using
+   user uploads for training.
 4. **Measure before cloud work.** CPU memory, cold startup, batch time,
    traffic assumptions, storage retention, and current AWS prices set the
    deployment design. Review a cost estimate, budget alert, and teardown
@@ -78,5 +80,6 @@ phone, keyboard, and slow/error states.
 
 Ideas to avoid for now: a single “authenticity percentage,” unvalidated
 heatmaps that imply the model found a manipulated region, a universal model
-ranking from the 12-image pilot, and permanent upload history before
-ownership/deletion rules exist.
+ranking from the 12-image pilot, and unbounded or automatic upload history.
+The current local history is explicit, limited, and deletable; hosted history
+still needs production identity, storage, and operations review.

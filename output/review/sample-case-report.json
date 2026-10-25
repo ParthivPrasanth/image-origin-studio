@@ -1,0 +1,49 @@
+{
+  "schema": "image-origin-case-report/v1",
+  "filename": "product_038_3Cgmcux-cpY.jpg",
+  "input": {
+    "sha256": "0fdde9b450f34681e62482a1bc7f2a368888b536cd58033a73cacad8039b21d6",
+    "width": 1920,
+    "height": 1340,
+    "image_format": "JPEG"
+  },
+  "analyzed_at": "2026-10-24T17:41:15.507404+00:00",
+  "requested_models": [
+    "v3_e2",
+    "community_forensics"
+  ],
+  "models": [
+    {
+      "model_key": "v3_e2",
+      "status": "success",
+      "prediction": "real",
+      "model_scores": {
+        "fake": 0.000654801435302943,
+        "real": 0.9993451985646971
+      },
+      "model_id": "owner-trained-v3-e2",
+      "model_revision": "v3-e2-e560a8a20a84",
+      "ai_score_threshold": 0.5,
+      "elapsed_ms": 6792,
+      "preprocessing_recipe": "v3-e2-exif-rgb-center-square-lanczos224-fft64-v1 + v3-e2-square224-mobile-v3-small-imagenet1k-v1",
+      "analyzed_at": "2026-10-24T17:41:15.507404+00:00"
+    },
+    {
+      "model_key": "community_forensics",
+      "status": "success",
+      "prediction": "real",
+      "model_scores": {
+        "fake": 0.00012624716869491677,
+        "real": 0.9998737528313051
+      },
+      "model_id": "Thermostatic/community-forensics-frontier-detector-2026-08",
+      "model_revision": "16db135220b318d811b207db576d90368980b595",
+      "ai_score_threshold": 0.65,
+      "elapsed_ms": 1317.3,
+      "preprocessing_recipe": "community-forensics-rgb-440-bicubic-center384-imagenet-v1",
+      "analyzed_at": "2026-10-24T17:41:15.507404+00:00"
+    }
+  ],
+  "disagreement": false,
+  "limitation": "Model suggestions are not proof of image origin or calibrated probabilities for arbitrary uploads. Each model has its own preprocessing and decision threshold. No combined verdict is produced."
+}
