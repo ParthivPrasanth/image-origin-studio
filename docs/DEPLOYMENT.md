@@ -24,6 +24,10 @@ These local limits do not establish cloud capacity, cost, or security.
 
 ## Staged route
 
+The detailed, measurement-first work plan is
+[AWS_IMPLEMENTATION_PLAN.md](AWS_IMPLEMENTATION_PLAN.md). Use its phase gates
+and record the actual account/region costs before selecting services.
+
 1. Run and test locally using the README commands. Try valid, corrupt, and oversized files; check the on-demand inspector and browser-generated case report too.
 2. Review the verified [local private-history slice](PRIVATE_HISTORY_IMPLEMENTATION_PLAN.md): guests stay unsaved; saving is off until a signed-in local test user opts in. Keep `IOS_LOCAL_TEST_AUTH=1` unset except when reviewing that local flow.
 3. Finish the remaining post-redesign live-state visual checks, then record download/load time, peak RAM, and warm inference time for V3 E2 alone, Community Forensics alone, and both loaded together. Repeat with several image sizes and a small batch. These measurements set the AWS compute requirement.

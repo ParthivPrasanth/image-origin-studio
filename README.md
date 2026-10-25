@@ -124,7 +124,7 @@ AWS is the planned deployment target; cloud infrastructure is **not deployed**. 
 
 - [Current milestone status and next gates](docs/NEXT_IMPLEMENTATION_PLAN.md)
 - [Local history behavior and verification](docs/PRIVATE_HISTORY_IMPLEMENTATION_PLAN.md) · [test record](docs/HISTORY_LOCAL_VERIFICATION_2026-10-25.md)
-- [Deployment route and release checks](docs/DEPLOYMENT.md)
+- [AWS implementation plan](docs/AWS_IMPLEMENTATION_PLAN.md) · [deployment route and release checks](docs/DEPLOYMENT.md)
 - [Screen plan](docs/WIREFRAMES.md) · [redesign review](docs/SITE_REDESIGN_REVIEW.md)
 - [Evaluation log](docs/EVALUATION.md) · [Content Credentials checks](docs/C2PA_FEASIBILITY.md) · [gallery source records](docs/GALLERY_MANIFEST.json)
 

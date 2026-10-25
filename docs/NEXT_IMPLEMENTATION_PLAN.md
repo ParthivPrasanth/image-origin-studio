@@ -12,7 +12,7 @@ below describe how features were built; the table is the current status.
 | Robustness lab (5) | Skipped by owner | No implementation planned. |
 | Site redesign | Implemented locally | [Review screenshots](SITE_REDESIGN_REVIEW.md) exist; complete the [remaining live-state matrix](SITE_REDESIGN_IMPLEMENTATION_PLAN.md) before release. |
 | Optional private history | Implemented for localhost test identities | [Verification record](HISTORY_LOCAL_VERIFICATION_2026-10-25.md) covers SQLite, exact originals, ownership, quota, deletion, and expiry. Hosted sign-in and cloud storage remain future work. |
-| AWS readiness and deployment (6–7) | Not started | Resource measurements, container verification, costed architecture, spending gate, and cloud checks remain. |
+| AWS readiness and deployment (6–7) | Planned; no cloud resources created | Follow the [AWS implementation plan](AWS_IMPLEMENTATION_PLAN.md): resource measurements, container verification, costed architecture, spending gate, and cloud checks remain. |
 
 The sample report artifacts under `output/` are review examples, not accuracy
 evidence. The owner reports checking the earlier C2PA, saved-report, and gallery
