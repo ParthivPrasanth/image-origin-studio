@@ -15,4 +15,4 @@ This is a local development check, not a hosted-account or AWS release.
 - The browser demonstration used stub scores; its displayed predictions are not model evidence. The offline real-model smoke only confirmed successful execution.
 - Alice and Bob are localhost-only test identities. The bearer token is signed in the running process and expires after one hour; restarting the API invalidates it. There is no Cognito integration, production identity, cloud storage, or public access control.
 - The local original directory uses the current Windows account's inherited access rules. The app does not encrypt originals itself. Hosted privacy, backups, deletion operations, request limits, capacity, cost, and exact AWS services require a separate owner review before deployment.
-- The gallery still awaits owner approval of its exact cases, labels, and reveal wording before any public frontend release.
+- Subsequent update: on 26 October 2026, the owner marked the gallery's exact cases, labels, and reveal wording ready for public inclusion.

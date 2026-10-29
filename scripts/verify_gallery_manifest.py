@@ -32,7 +32,10 @@ def require(condition: bool, message: str) -> None:
 
 def main() -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    require(manifest.get("status") == "local-review-draft", "Gallery status must remain local review draft")
+    require(
+        manifest.get("status") == "owner-reviewed-ready-for-publication",
+        "Gallery status must record owner publication review",
+    )
     cases = manifest.get("cases")
     require(isinstance(cases, list) and 8 <= len(cases) <= 12, "Gallery needs 8-12 cases")
     seen_ids: set[str] = set()
@@ -85,7 +88,7 @@ def main() -> int:
                     f"{case_id}: invalid suggestion")
             require(bool(run.get("preprocessingRecipe")) and bool(run.get("analyzedAt")),
                     f"{case_id}: recipe or timestamp missing")
-    print(f"Verified {len(cases)} draft gallery records and distinct display assets")
+    print(f"Verified {len(cases)} gallery records and distinct display assets")
     return 0
 
 

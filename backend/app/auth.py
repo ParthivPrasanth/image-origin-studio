@@ -1,8 +1,4 @@
-"""Fail-closed local test identity for the private-history development slice.
-
-Production identity is deliberately unavailable until a managed provider is
-configured and its token verification is implemented during AWS readiness.
-"""
+"""Verified Cognito identity, with localhost-only disposable test identities."""
 
 from __future__ import annotations
 
@@ -13,9 +9,12 @@ import hmac
 import ipaddress
 import json
 import os
+import re
 import secrets
 import time
 from dataclasses import dataclass
+from functools import lru_cache
+from urllib.parse import urlsplit
 
 from fastapi import HTTPException, Request
 
@@ -27,6 +26,41 @@ _SECRET = secrets.token_bytes(32)
 @dataclass(frozen=True)
 class Identity:
     sub: str
+
+
+def cognito_config() -> dict[str, str] | None:
+    """Return complete public user-pool settings, or fail on partial config."""
+    names = {
+        "region": "IOS_COGNITO_REGION",
+        "user_pool_id": "IOS_COGNITO_USER_POOL_ID",
+        "client_id": "IOS_COGNITO_CLIENT_ID",
+        "domain": "IOS_COGNITO_DOMAIN",
+    }
+    values = {key: os.getenv(name, "").strip() for key, name in names.items()}
+    if not any(values.values()):
+        return None
+    if not all(values.values()):
+        raise RuntimeError("Cognito settings are incomplete.")
+    region = values["region"]
+    pool = values["user_pool_id"]
+    client = values["client_id"]
+    domain = values["domain"].rstrip("/")
+    parsed = urlsplit(domain)
+    if (
+        not re.fullmatch(r"[a-z]{2}(?:-[a-z]+)+-\d", region)
+        or not re.fullmatch(re.escape(region) + r"_[A-Za-z0-9]+", pool)
+        or not re.fullmatch(r"[A-Za-z0-9]+", client)
+        or parsed.scheme != "https"
+        or not parsed.hostname
+        or parsed.netloc != parsed.hostname
+        or not re.fullmatch(r"[A-Za-z0-9.-]+", parsed.hostname)
+        or parsed.path
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise RuntimeError("Cognito settings are invalid.")
+    values["domain"] = domain
+    return values
 
 
 def local_test_enabled() -> bool:
@@ -43,7 +77,59 @@ def _local_request(request: Request) -> bool:
 
 
 def local_test_available(request: Request) -> bool:
-    return local_test_enabled() and _local_request(request)
+    return cognito_config() is None and local_test_enabled() and _local_request(request)
+
+
+@lru_cache(maxsize=4)
+def _cognito_jwks_client(issuer: str):
+    import jwt
+
+    return jwt.PyJWKClient(
+        f"{issuer}/.well-known/jwks.json",
+        cache_jwk_set=True,
+        lifespan=3600,
+        timeout=5,
+    )
+
+
+def _cognito_identity(token: str, config: dict[str, str]) -> Identity:
+    """Verify RS256 signature and all access-token binding claims."""
+    try:
+        import jwt
+    except ImportError:
+        raise HTTPException(status_code=503, detail="Sign-in is unavailable.") from None
+    try:
+        issuer = (
+            f"https://cognito-idp.{config['region']}.amazonaws.com/"
+            f"{config['user_pool_id']}"
+        )
+        key = _cognito_jwks_client(issuer).get_signing_key_from_jwt(token).key
+        claims = jwt.decode(
+            token,
+            key=key,
+            algorithms=["RS256"],
+            issuer=issuer,
+            leeway=30,
+            options={
+                "verify_aud": False,
+                "require": ["exp", "iat", "iss", "sub", "client_id", "token_use"],
+            },
+        )
+        subject = claims.get("sub")
+        if (
+            claims.get("token_use") != "access"
+            or claims.get("client_id") != config["client_id"]
+            or not isinstance(subject, str)
+            or not subject.strip()
+        ):
+            raise ValueError("Invalid access-token claims")
+        return Identity(sub=subject)
+    except (jwt.PyJWKClientConnectionError, OSError):
+        raise HTTPException(
+            status_code=503, detail="Sign-in verification is temporarily unavailable."
+        ) from None
+    except (jwt.PyJWTError, ValueError, TypeError):
+        raise HTTPException(status_code=401, detail="Invalid or expired sign-in.") from None
 
 
 def _encode(value: dict[str, object]) -> str:
@@ -87,6 +173,9 @@ def optional_identity(request: Request) -> Identity | None:
     scheme, _, token = authorization.partition(" ")
     if scheme.lower() != "bearer" or not token:
         raise HTTPException(status_code=401, detail="Invalid authorization header.")
+    config = cognito_config()
+    if config is not None:
+        return _cognito_identity(token, config)
     if not local_test_available(request):
         raise HTTPException(status_code=401, detail="Sign-in is unavailable in this build.")
     try:

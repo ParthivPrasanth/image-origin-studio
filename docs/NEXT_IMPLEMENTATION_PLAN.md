@@ -1,18 +1,20 @@
 # Next implementation plan — Image Origin Studio
 
-**Current status (25 October 2026):** This began as a proposal and now records
-the local implementation and remaining gates. Historical milestone instructions
-below describe how features were built; the table is the current status.
+**Status update (29 October 2026):** The owner deployed the public AWS site and
+confirmed HTTPS, both models, Cognito sign-in, and a History save. This file
+retains the implementation chronology; the [deployment guide](DEPLOYMENT.md)
+tracks current host operations and remaining live checks. Historical milestone
+instructions below describe how features were built.
 
 | Work | Current state | Evidence or remaining gate |
 | --- | --- | --- |
-| Input inspector and case report (1–2) | Implemented locally | Backend checks and browser report review; the print-to-PDF browser path still needs a manual saved-PDF check. |
-| Challenge gallery (3) | Eight-case local review draft | [Manifest](GALLERY_MANIFEST.json) and source records exist; exact cases, labels, and reveal wording await owner approval before publication. |
-| Content Credentials (4) | Local browser prototype | [C2PA checks](C2PA_FEASIBILITY.md) include trusted, valid, invalid, and absent cases. Unsupported format and a credential/model-real conflict still lack a recorded browser check. |
+| Input inspector and case report (1–2) | Implemented locally | Backend checks and browser report review; the owner marked saved/printed PDF review done on 26 October 2026. |
+| Challenge gallery (3) | Eight-case local gallery | [Manifest](GALLERY_MANIFEST.json) and source records exist; the owner marked the cases and reveal wording ready for publication on 26 October 2026. |
+| Content Credentials (4) | Local browser prototype | [C2PA checks](C2PA_FEASIBILITY.md) include trusted, valid, invalid, and absent cases; a controlled conflict UI check is recorded. The owner reports completing the edge check separately, without fixture details in this record. |
 | Robustness lab (5) | Skipped by owner | No implementation planned. |
 | Site redesign | Implemented locally | [Review screenshots](SITE_REDESIGN_REVIEW.md) exist; complete the [remaining live-state matrix](SITE_REDESIGN_IMPLEMENTATION_PLAN.md) before release. |
-| Optional private history | Implemented for localhost test identities | [Verification record](HISTORY_LOCAL_VERIFICATION_2026-10-25.md) covers SQLite, exact originals, ownership, quota, deletion, and expiry. Hosted sign-in and cloud storage remain future work. |
-| AWS readiness and deployment (6–7) | Planned; no cloud resources created | Follow the [AWS implementation plan](AWS_IMPLEMENTATION_PLAN.md): resource measurements, container verification, costed architecture, spending gate, and cloud checks remain. |
+| Optional private history | Local path verified; hosted save confirmed | [Verification record](HISTORY_LOCAL_VERIFICATION_2026-10-25.md) covers SQLite behavior. Cognito login and S3/DynamoDB adapter passed local tests; the owner confirmed a hosted sign-in and save. Two-account isolation, failure/retry, and hosted deletion still need recorded checks. |
+| AWS readiness and deployment (6–7) | Public single-host deployment running | [26 October checkpoint](AWS_READINESS_2026-10-26.md) records local parity and sizing; [deployment guide](DEPLOYMENT.md) records the owner's live success and remaining cost, TLS, capacity, and privacy checks. |
 
 The sample report artifacts under `output/` are review examples, not accuracy
 evidence. The owner reports checking the earlier C2PA, saved-report, and gallery
@@ -156,13 +158,12 @@ mobile layout work; the examples include honest model mistakes or
 disagreements. If origin or display rights cannot be established for a
 candidate, exclude it rather than weaken the label.
 
-**Review gate:** owner approves the exact gallery cases, their labels, and
-the reveal wording before they are published. Current candidate records are
+**Review gate:** the owner marked the exact gallery cases, labels, and reveal
+wording ready for publication on 26 October 2026. Current records are
 `docs/GALLERY_MANIFEST.json`, `docs/GALLERY_PUBLIC_AI_SOURCES.md`, and
 `docs/GALLERY_CAMERA_SOURCES.md`; optimized candidate assets are under
-`frontend/public/gallery/candidates/`. The app labels these
-as a local review draft. Do not deploy the current frontend bundle publicly
-until the owner accepts this set.
+`frontend/public/gallery/candidates/`. Preserve the source and rights records
+when publishing the gallery.
 
 ## Milestone 4 — C2PA provenance panel
 
@@ -267,7 +268,7 @@ remove all resources. Mark the app “deployed” only after these checks pass.
 | First build slice | Inspector + case report, implemented locally | Immediately useful with the current two-model app. |
 | Report formats | JSON plus print/save-as-PDF page, implemented locally | Reproducible data and a readable artifact without server report-file storage. |
 | Original image in report | Excluded by default | Limits accidental sharing of private image content. |
-| Gallery | Eight-case local review draft | Makes the app engaging without claiming benchmark accuracy; publication review remains. |
+| Gallery | Eight-case local gallery, owner marked ready for publication | Makes the app engaging without claiming benchmark accuracy. |
 | C2PA | Local prototype implemented | Adds separate provenance information; remaining browser cases are listed above. |
 | Robustness lab | Skipped by owner | Keep the current workbench focused. |
 | Accounts/history | Local test identities and opt-in SQLite history implemented | Exact originals have 30-day retention and 10-item/50-MB per-identity limits; hosted identity and storage remain. |

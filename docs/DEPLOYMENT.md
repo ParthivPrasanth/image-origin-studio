@@ -1,50 +1,81 @@
-# Deployment guide for a first cloud project
+# Deployment and operations
 
-## Current status
+**Maintained status · 29 October 2026.** Image Origin Studio is publicly reachable at [https://35.154.237.144/](https://35.154.237.144/). The owner-run deployment conversation records an HTTPS 200 from Nginx, a healthy `/api/health` response, successful use of both models, Cognito sign-in, and an image saved to History. A fresh API health request from the documentation update also returned HTTP 200. This is evidence of a working deployment at those times, not a guarantee of continuing uptime or full security verification. The endpoint is an Elastic IP; no custom domain is evidenced.
 
-This repository currently runs on one PC. AWS is the planned deployment target, but no AWS resources have been created. Optional private history is implemented and verified for localhost test identities; see the [local verification record](HISTORY_LOCAL_VERIFICATION_2026-10-25.md). The synopsis describes a possible AWS design and an older DINOv2/FFT model. This project uses the owner's V3 E2 model and the separately credited Community Forensics baseline described in the README.
+For first-time setup, the [self-deployment runbook](AWS_SELF_DEPLOY_RUNBOOK.md) provides console and shell steps. Its original predeployment wording and prices are dated; use this page for current status and the live AWS console for current costs. [Architecture and data flow](ARCHITECTURE.md) explains the code path.
 
-For the local history slice, saving is opt-in and keeps the exact original
-plus its analysis for 30 days. Implemented limits are 10 images or 50 MB per local
-test identity and 500 MB combined saved originals across local identities.
-Guests remain unsaved. Local test authentication is gated by
-`IOS_LOCAL_TEST_AUTH=1` and is
-off by default; it is not Cognito, production authentication, or an AWS
-integration. The application does not encrypt local history files itself.
-These local limits do not establish cloud capacity, cost, or security.
+## What is deployed
 
-## Terms
+| Component | Purpose | Current arrangement |
+| --- | --- | --- |
+| Ubuntu EC2 host in Mumbai (`ap-south-1`) | Runs the public site and API | One host; this is a small, owner-managed deployment. |
+| Nginx and HTTPS | Serves the React build and sends `/api` requests to FastAPI | Static files under `/var/www/image-origin-studio/`; API target bound to `127.0.0.1:8001`. HTTP redirects to HTTPS. |
+| Dockerized FastAPI | Validates images, runs the pinned models, handles History | One `image-origin-api` container. First inference may download model weights. `/api/health` is a process check, not a model-readiness check. |
+| Amazon Cognito | Hosted user identity | Authorization-code flow with PKCE in the browser; API validates access tokens. |
+| Private S3 + DynamoDB | Opted-in History | S3 stores exact originals; DynamoDB stores result snapshots, metadata, and quota counters. Guest and unsaved analyses are not added to History. |
+| EC2 instance role | AWS access for the API | Scoped to the configured History resources; no static AWS keys need to be placed in the container. |
 
-- **Frontend:** the React page shown in a browser.
-- **API:** the FastAPI server receiving images and returning results.
-- **Worker:** a separate process that would run slow model jobs from a queue.
-- **Object storage:** private storage for uploaded files, such as S3.
-- **Queue:** a service such as SQS that holds jobs until a worker can process them.
-- **Database:** stores job status and results, not the model itself.
+The deployment uses **no load balancer, NAT gateway, queue, or separate model worker** in the documented topology. It runs analyses synchronously and the UI processes a batch sequentially. The [Nginx template](../infra/nginx-https.conf.template), [IAM template](../infra/iam-policy.json.template), and [Dockerfile](../Dockerfile) are parameterized source artifacts; actual resource identifiers and credentials must remain outside Git.
 
-## Staged route
+## Request and data path
 
-The detailed, measurement-first work plan is
-[AWS_IMPLEMENTATION_PLAN.md](AWS_IMPLEMENTATION_PLAN.md). Use its phase gates
-and record the actual account/region costs before selecting services.
+1. A browser loads the React build over HTTPS from Nginx. Nginx forwards `/api` to the Docker container on loopback.
+2. For analysis, the API validates the uploaded bytes and runs V3 E2 and/or Community Forensics. The response carries separate results. A guest can use this path without signing in.
+3. For History, the browser signs in through Cognito. A signed-in user must select Save before the analysis; the API validates the token, saves the unmodified original to private S3, and records the result in DynamoDB. The code enforces 30-day expiry, 10 items/50 MiB per identity, and 500 MiB of saved originals globally.
+4. History reads and deletes use the Cognito subject for ownership. Expired or deleting items are denied on read; an hourly background sweep retries cleanup. The live conversation establishes one successful save, while the full ownership/failure matrix below still needs a recorded host test.
 
-1. Run and test locally using the README commands. Try valid, corrupt, and oversized files; check the on-demand inspector and browser-generated case report too.
-2. Review the verified [local private-history slice](PRIVATE_HISTORY_IMPLEMENTATION_PLAN.md): guests stay unsaved; saving is off until a signed-in local test user opts in. Keep `IOS_LOCAL_TEST_AUTH=1` unset except when reviewing that local flow.
-3. Finish the remaining post-redesign live-state visual checks, then record download/load time, peak RAM, and warm inference time for V3 E2 alone, Community Forensics alone, and both loaded together. Repeat with several image sizes and a small batch. These measurements set the AWS compute requirement.
-4. As a separate later stage, choose AWS compute and supporting services that meet the measured requirements, then estimate cost using current pricing. Review hosted sign-in, the history database, private originals, 30-day retention, and request controls. The local 10-image/50-MB and 500-MB caps are not AWS sizing or cost assumptions. Check the account's actual Free Tier plan and credit balance in Billing; no storage cap guarantees zero cost.
-5. Containerize the backend and test startup, pinned weights, and restart locally. Add a queue only if the measurements justify it; then test retries and idempotency.
-6. Review the exact AWS services, region, monthly estimate, spending alert, and teardown commands before creating paid resources.
-7. Deploy, verify private uploads and ownership, monitor failures, and document how to delete everything.
+The browser-side C2PA check uses original file bytes and stays separate from model inference. Reports are generated in the browser. Model scores are not proof of image origin or a substitute for a source record.
 
-One possible AWS path is S3 → SQS → worker. The browser would ask the API for an upload URL and a job ID; the worker would take a queued job, run the model, and store a status/result that the browser can fetch. The exact services depend on sizing and cost review. This architecture is a design option, **not current functionality**.
+## Build and deploy a repository revision
 
-## Release checklist
+The repository provides an owner-run PowerShell packager. On a Windows development machine with Docker Desktop, Python/npm dependencies, and the intended source revision checked out:
 
-- Local inference validated on known-origin images with recorded sources
-- Local history guest path, explicit save opt-in, exact-original retrieval, identity ownership, 30-day expiry, and deletion verified before describing the flow as complete
-- Model and pretrained-backbone usage terms reviewed for the planned public deployment; [TorchVision notes](https://docs.pytorch.org/vision/master/models.html) that pretrained weights can have dataset-derived terms
-- Memory/time measurements support host choice
-- Image retention and account deletion rules written and tested
-- File limits, request limits, private storage, and least-privilege access tested
-- Failure/retry behavior and metrics verified
-- Cost estimate, budget alert, and teardown reviewed
+```powershell
+.\scripts\package_aws_trial.ps1 -OutputDirectory .local/aws-trial-bundle-N
+```
+
+The output path must be new. The ignored bundle contains the frontend `dist/`, a Docker image archive, and a manifest with its SHA-256 and source-tree state. Review `working_tree_dirty` and the exact commit/diff before distributing a new build. Follow [runbook sections 3–4](AWS_SELF_DEPLOY_RUNBOOK.md#3-build-on-your-pc-and-transfer) to transfer, verify, and install the bundle on the EC2 host. The application copy in this repository is **not automatically deployed** when files change locally or when a GitHub repository is later created.
+
+Before replacing a running container, record its current image ID and configuration privately so it can be restored if the new build fails. Replace the static build and container during a planned change window; then run the checks below. The runbook has the exact Docker command shape and Nginx template. Keep `IOS_LOCAL_TEST_AUTH` unset on the host. Cognito and AWS History settings must be configured together; a partial configuration fails at API startup.
+
+## Verify an update
+
+Run the repository's backend tests, lint, gallery-manifest verification, frontend format check, and build locally first; the [README](../README.md#developer-checks) lists the commands. On the actual host, record the deployed source revision and check:
+
+```bash
+sudo nginx -t
+sudo docker ps --filter name=image-origin-api
+sudo docker logs --tail 100 image-origin-api
+curl --fail http://127.0.0.1:8001/api/health
+```
+
+From a browser or separate client, open the HTTPS root and check the certificate, then run **real inference** with known, non-sensitive images through each model. Check at least one failed/invalid upload, a guest analysis, sign-in, explicit save, reopening original bytes, and deletion. A healthy endpoint alone does not load the models or test S3, DynamoDB, Cognito, or the browser.
+
+## Ongoing operation
+
+- **Availability and performance:** inspect Nginx and container status, application errors, EC2 CPU credits, memory, disk, and request latency. This one-host topology has no automatic failover. Cold model loading and two concurrent requests should be measured on the actual host before making throughput claims.
+- **Model cache:** a new host or container with an empty cache must download the pinned, hash-checked weights on first use. Confirm outbound access and perform a real inference before publicizing a new host.
+- **TLS:** the runbook describes a short-lived Let's Encrypt IP certificate. The deployment chat records a successful `certbot renew --dry-run` and active cron service; it does **not** show the installed six-hour renewal job. Inspect `/etc/cron.d/` or the chosen scheduler, run a renewal dry run, and record certificate expiry and the Nginx reload hook. Missing renewal can make the site inaccessible within days.
+- **Storage and retention:** review S3 object count/age and DynamoDB records, especially items pending deletion. The code's 30-day read expiry and hourly sweep should be checked against live resources. S3 lifecycle is a backup, not a substitute for application cleanup.
+- **Cost:** the owner selected a **USD 20 maximum planning ceiling** after the original USD 35 proposal. The actual AWS Budget, alert thresholds, spend, credit use, and teardown date are not confirmed in the available deployment record. Check live Billing before further operation and set/verify alerts within that ceiling. A budget alert is **not a hard cap** and can lag. The earlier proposal's USD 35 figures are historical and must not be treated as current authorization to spend.
+- **Backups:** the original trial design did not include a recoverable backup strategy. Do not describe saved History as durable against host, bucket, table, or account loss until backup and restore have been designed and tested.
+
+## Remaining release and operations checks
+
+These are **unverified in the available deployment record**, not claims that the implementation is broken:
+
+| Check | Evidence to record |
+| --- | --- |
+| Account isolation | With two real Cognito accounts, verify account B cannot list, fetch, download, or delete account A's History item. |
+| Retention and failure recovery | Verify 30-day denial, S3/DynamoDB cleanup, one deliberate deletion failure followed by retry, and account-wide deletion. |
+| Quotas and request controls | Exercise owner/global History limits and check Nginx upload/rate limits on the host. |
+| TLS renewal | Show the installed schedule, dry-run result, deploy hook, and current certificate expiry. |
+| Cost controls | Record the live budget/alerts, actual pre-credit and out-of-pocket spend, service pricing, and teardown date under the USD 20 planning ceiling. |
+| Capacity | Record cold start, memory, CPU credits, request timing, and at least two concurrent requests on the EC2 host. |
+| Deploy reproducibility | Record the source revision, manifest SHA-256, image ID, configuration, and post-deploy smoke result for each public update. |
+
+Do not use private user images for these checks without their permission. Use disposable accounts and known, non-sensitive fixtures.
+
+## Stop and teardown
+
+To stop public use promptly, close ingress at the security group or Nginx, then stop the API container. Disabling the service does not itself remove charges. At the agreed trial end, delete saved test History through the app, verify S3 and DynamoDB cleanup, and then remove the trial bucket, table, Cognito resources, EC2 instance and disk, Elastic IP, IAM role/policy, security group, logs, and Budget. Check Billing after its reporting delay. The [runbook teardown inventory](AWS_SELF_DEPLOY_RUNBOOK.md#6-teardown-on-the-trial-end-date) lists the full manual sequence. Record actual costs and deletion evidence in a private operator note, not this public repository.

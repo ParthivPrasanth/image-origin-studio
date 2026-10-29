@@ -1,6 +1,7 @@
-# Camera-photo gallery candidates — source and rights record
+# Camera-photo gallery sources and rights
 
-**Status:** four local review candidates acquired 25 October 2026. Each
+**Status:** four cases acquired 25 October 2026; the owner marked the gallery
+ready for public inclusion on 26 October 2026. Each
 source page is an individual U.S. Geological Survey (USGS) photography record
 that explicitly marks the image **Public Domain**. The page's photography
 classification, description, institutional provenance, and photographer or
@@ -9,8 +10,8 @@ RAW or independently verified capture. The gallery labels therefore say
 **documented camera photograph** rather than proof of capture.
 
 These files are used in a source-documented product demonstration, not an
-evaluation sample. The owner must approve the exact cases, source labels,
-attribution, and reveal wording before public release.
+evaluation sample. The owner marked the exact cases, source labels,
+attribution, and reveal wording ready for public inclusion on 26 October 2026.
 
 | Case | Source page and creator credit | Acquired source copy | Source SHA-256 | Display SHA-256 |
 | --- | --- | --- | --- | --- |

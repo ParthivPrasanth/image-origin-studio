@@ -123,6 +123,10 @@
   text-underline-offset: 3px;
 }
 
+.history-link-button {
+  margin-left: 8px;
+}
+
 .history-danger-link:disabled {
   color: #9da5a1;
   cursor: not-allowed;

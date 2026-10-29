@@ -82,16 +82,16 @@ not encrypt local files itself. The local sign-in, opt-in save, exact-original
 retrieval, quota enforcement, deletion, and expiry checks are recorded in the
 linked verification note. Hosted sign-in and storage remain separate work.
 
-## Challenge gallery — local review draft
+## Challenge gallery
 
-The separate Gallery view has an eight-case source-documented local draft. A neutral title
+The separate Gallery view has eight source-documented cases. A neutral title
 and display image appear before reveal; the visitor selects a private camera
 photo or AI-generated guess. Reveal shows the documented origin, both pinned
 model suggestions, any disagreement or conflict, and the source page,
 attribution, rights, edits, and exact display-file hash. Filters show origin,
 disagreement, and model conflict. Guesses remain in tab memory and no gallery
-accuracy is calculated. The exact cases and wording await owner approval
-before public deployment.
+accuracy is calculated. On 26 October 2026, the owner marked the exact cases
+and wording ready for public inclusion.
 
 ## Visual review checklist
 

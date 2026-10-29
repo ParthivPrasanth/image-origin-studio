@@ -1,6 +1,7 @@
 # Public AI-image gallery sources
 
-**Status:** four curated local review cases, acquired 25 October 2026. These are
+**Status:** four curated cases acquired 25 October 2026; the owner marked the
+gallery ready for public inclusion on 26 October 2026. These are
 public [COCOXGEN dataset](https://huggingface.co/datasets/heikeadel/cocoxgen)
 images by Philipp Moeßner and Heike Adel, distributed under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The dataset identifies

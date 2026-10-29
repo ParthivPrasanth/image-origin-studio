@@ -1,8 +1,8 @@
 # Site redesign implementation plan
 
-**Status:** implemented locally, pending owner screen review and the remaining
-live-state checks, 25 October 2026. The owner verified the earlier C2PA flow,
-report, and gallery and chose to skip the optional robustness lab.
+**Status:** implemented locally, with some browser states still unchecked,
+updated 26 October 2026. The owner marked PDF printing, keyboard use, and
+gallery publication review complete and chose to skip the optional robustness lab.
 
 **Implementation checkpoint (25 October 2026):** The owner subsequently
 authorized this redesign. The Analyze/Gallery navigation, selected-image
@@ -11,9 +11,11 @@ are implemented locally. Frontend formatting and production build pass;
 13 targeted backend tests pass. Empty, two-file ready, gallery grid, and
 one-case reveal states were checked in a browser at phone, tablet, and desktop
 widths. Review screenshots are in `../output/review/redesign/`; see
-`SITE_REDESIGN_REVIEW.md`. The owner still needs to review those screens.
-The complete live analyzed, partial-error, credential-conflict, inspector,
-and PDF-print visual matrix has not yet been rechecked after the redesign.
+`SITE_REDESIGN_REVIEW.md`. A later release sweep checked analyzed results,
+partial-model error handling, and the inspector. The owner marked keyboard use
+and saved/printed PDF review complete. A later local sweep checked History's
+full, deleted, and expired states, and the owner reports completing the C2PA
+edge check; see `RELEASE_CHECK_PLAN.md` for evidence boundaries.
 
 ## Goal
 

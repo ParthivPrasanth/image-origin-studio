@@ -110,7 +110,7 @@ export default function Gallery({ cases }: Props) {
     >
       <div className="gallery-intro">
         <div>
-          <p className="eyebrow">LOCAL REVIEW DRAFT · NOT PUBLISHED</p>
+          <p className="eyebrow">SOURCE-DOCUMENTED EXAMPLES</p>
           <h2 id="gallery-title">Try a source-documented image</h2>
           <p>
             Make a private guess, then reveal the source record and each model’s

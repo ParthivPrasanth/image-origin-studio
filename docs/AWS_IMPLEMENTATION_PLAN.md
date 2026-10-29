@@ -1,7 +1,13 @@
 # AWS readiness and first deployment implementation plan
 
-**Status:** implementation plan for owner review, 25 October 2026. No AWS
-resources have been created by this plan. Image Origin Studio currently runs
+> **Historical implementation plan.** The owner deployed a public AWS site on
+> 29 October 2026. The future-tense stages below describe the original build
+> plan, not today's status. See [Deployment and operations](DEPLOYMENT.md).
+
+**Status:** implementation plan for owner review, 25 October 2026. The
+[26 October readiness checkpoint](AWS_READINESS_2026-10-26.md) records a
+local browser sweep, cached-weight measurements, and a verified local Linux
+container run. No AWS resources have been created. Image Origin Studio currently runs
 locally with two pinned models, browser-side Content Credentials checks, and
 opt-in SQLite history for localhost test identities. The target is a small,
 working AWS release that keeps guest analysis open and gives signed-in users
@@ -50,11 +56,10 @@ dated record under `docs/`.
    states. Check keyboard navigation and report save/print once. Record which
    Content Credentials cases were checked in the actual browser; the
    [C2PA record](C2PA_FEASIBILITY.md) names remaining case-specific gaps.
-2. Resolve or explicitly defer any release-blocking issue. The gallery is a
-   source-documented **local review draft**; obtain the owner's decision on
-   its exact assets, labels, and reveal wording before including it in a
-   public frontend build. If deferred, remove the gallery route and assets
-   from the public build rather than publishing an unapproved draft.
+2. Resolve or explicitly defer any release-blocking issue. The owner marked
+   the source-documented gallery's assets, labels, and reveal wording ready
+   for public inclusion on 26 October 2026. Keep its source and rights records
+   with the published version.
 3. Run backend tests/Ruff and frontend format/build checks; record versions,
    commit, and pass/fail results. Avoid a new model accuracy evaluation here.
 
@@ -239,7 +244,18 @@ cost window, known limits, and operator/teardown instructions in `docs/`.
 
 ## Immediate next action
 
-Start with Phase 0's short release sweep and Phase 1's measurement script.
-They need no AWS provisioning and determine the affordable compute path.
-After Phase 2, prepare the concrete Phase 3 cost/resource review; the owner
-then has a specific deployment proposal to approve.
+The local Phase 0 browser checklist is marked complete. Finish Phase 1
+target-sized CPU and concurrency checks in the [readiness checkpoint](AWS_READINESS_2026-10-26.md).
+The Phase 2 Docker Desktop WSL 2 build, parity, restart, and invalid-upload
+checks passed locally. The [Mumbai trial proposal](AWS_TRIAL_PROPOSAL_2026-10-26.md)
+now names candidate resources, a provisional 24-hour/14-day/30-day worksheet,
+a spending guardrail, and teardown order. Phase 3 remains open until the
+current Mumbai prices, account-specific service access, and the budget setup
+are checked and the owner reviews the final costed package. The owner's
+29 October Billing screenshots show a Free plan, USD 100 remaining, and an
+expiry of 29 April 2027; see the proposal for the separate Credits-page
+display. The Cognito browser/API path and S3/DynamoDB History adapter now
+exist locally; their unit and contract tests pass, but they have not been
+exercised against an AWS account. The [self-deployment runbook](AWS_SELF_DEPLOY_RUNBOOK.md)
+records owner-executed setup, verification, and teardown. No resources have
+been created.

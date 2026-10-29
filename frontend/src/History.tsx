@@ -18,6 +18,7 @@ import "./history.css";
 type Props = {
   token: string | null;
   localAuthAvailable: boolean;
+  cognitoAvailable: boolean;
   onOpenSavedItem?: (item: HistoryItem, original: File) => void;
 };
 
@@ -60,6 +61,7 @@ function quotaText(quota: HistoryQuota) {
 export default function History({
   token,
   localAuthAvailable,
+  cognitoAvailable,
   onOpenSavedItem,
 }: Props) {
   const [items, setItems] = useState<HistoryItem[]>([]);
@@ -100,7 +102,6 @@ export default function History({
     setLoaded(null);
     setCredential(undefined);
     setError("");
-    setMessage("");
     if (!token) {
       setLoading(false);
       return () => controller.abort();
@@ -127,6 +128,8 @@ export default function History({
     return () => controller.abort();
   }, [token, refreshKey]);
 
+  useEffect(() => setMessage(""), [token]);
+
   async function openItem(summary: HistoryItem) {
     if (!token) return;
     openRequest.current?.abort();
@@ -152,9 +155,12 @@ export default function History({
     } catch (reason) {
       if (!controller.signal.aborted)
         setError(
-          reason instanceof Error
-            ? reason.message
-            : "This saved image is unavailable.",
+          reason instanceof Error &&
+            reason.message === "History item unavailable."
+            ? "This saved image is unavailable. It may have expired or been deleted. Refresh History to update the list."
+            : reason instanceof Error
+              ? reason.message
+              : "This saved image is unavailable.",
         );
     } finally {
       if (!controller.signal.aborted) setDetailLoading(false);
@@ -238,6 +244,7 @@ export default function History({
           ? `${deletion.pending} file deletion${deletion.pending === 1 ? " is" : "s are"} pending retry. All saved items are inaccessible.`
           : "All saved images and analysis records were deleted.",
       );
+      setRefreshKey((value) => value + 1);
     } catch (reason) {
       setError(
         reason instanceof Error
@@ -262,19 +269,23 @@ export default function History({
           <p className="history-eyebrow">PRIVATE ACCOUNT DATA</p>
           <h1 id="history-title">History</h1>
           <p>
-            {localAuthAvailable
+            {cognitoAvailable || localAuthAvailable
               ? "Sign in to view analyses you chose to save."
-              : "History is available only while local test sign-in is enabled."}
+              : "History is available when sign-in is configured."}
           </p>
         </header>
         <div className="history-signin" role="status">
           <h2>
-            {localAuthAvailable ? "Sign in to open History" : "History is off"}
+            {cognitoAvailable || localAuthAvailable
+              ? "Sign in to open History"
+              : "History is off"}
           </h2>
           <p>
-            {localAuthAvailable
-              ? "Use one of the local test identities in the header. Analyze and Gallery remain available without signing in."
-              : "Restart the local API with IOS_LOCAL_TEST_AUTH=1 to review private history. Analyze and Gallery remain available as a guest."}
+            {cognitoAvailable
+              ? "Use Sign in for History in the header. Analyze and Gallery remain available without signing in."
+              : localAuthAvailable
+                ? "Use one of the local test identities in the header. Analyze and Gallery remain available without signing in."
+                : "Sign-in is not configured. Analyze and Gallery remain available as a guest."}
           </p>
         </div>
       </section>
@@ -295,6 +306,13 @@ export default function History({
       {quota && (
         <div className="history-quota" aria-label="History storage quota">
           <span>{quotaText(quota)}</span>
+          {(quota.used_items >= quota.max_items ||
+            quota.used_bytes >= quota.max_bytes) && (
+            <strong>
+              History is full. Delete a saved image to make room, or analyze
+              without saving.
+            </strong>
+          )}
           {quota.global_full && (
             <strong>New saves are paused while shared storage is full.</strong>
           )}
@@ -303,13 +321,13 @@ export default function History({
       {error && (
         <p className="history-alert" role="alert">
           {error}
-          {items.length === 0 && !loading && (
+          {!loading && (
             <button
               className="history-link-button"
               type="button"
               onClick={() => setRefreshKey((value) => value + 1)}
             >
-              Try again
+              Refresh History
             </button>
           )}
         </p>

@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { analyze } from "./api";
 import C2paPanel from "./C2paPanel";
+import {
+  beginCognitoLogin,
+  clearCognitoSession,
+  cognitoLogoutUrl,
+  completeCognitoLogin,
+  currentCognitoToken,
+  type CognitoPublicConfig,
+} from "./cognitoAuth";
 import Gallery from "./Gallery";
 import History from "./History";
 import { galleryCases } from "./galleryData";
@@ -43,9 +51,18 @@ export default function App() {
   const [view, setView] = useState<"analyze" | "gallery" | "history">(
     currentView,
   );
-  const [token, setToken] = useState<string | null>(() =>
-    sessionStorage.getItem("ios_local_test_token"),
+  const [token, setToken] = useState<string | null>(
+    () =>
+      currentCognitoToken() || sessionStorage.getItem("ios_local_test_token"),
   );
+  const [authMode, setAuthMode] = useState<"cognito" | "local" | null>(() =>
+    currentCognitoToken()
+      ? "cognito"
+      : sessionStorage.getItem("ios_local_test_token")
+        ? "local"
+        : null,
+  );
+  const [cognito, setCognito] = useState<CognitoPublicConfig | null>(null);
   const [testUser, setTestUser] = useState<string | null>(() =>
     sessionStorage.getItem("ios_local_test_user"),
   );
@@ -66,13 +83,72 @@ export default function App() {
     return () => window.removeEventListener("hashchange", updateView);
   }, []);
   useEffect(() => {
+    let active = true;
     fetch("/api/auth/capabilities")
-      .then((response) => response.json())
-      .then((capabilities) =>
-        setLocalAuthAvailable(capabilities.local_test_available === true),
-      )
-      .catch(() => setLocalAuthAvailable(false));
+      .then((response) => {
+        if (!response.ok) throw new Error("Sign-in settings are unavailable.");
+        return response.json() as Promise<{
+          local_test_available?: boolean;
+          cognito?: CognitoPublicConfig | null;
+        }>;
+      })
+      .then(async (capabilities) => {
+        if (!active) return;
+        const hosted = capabilities.cognito ?? null;
+        setCognito(hosted);
+        setLocalAuthAvailable(capabilities.local_test_available === true);
+        if (hosted) {
+          sessionStorage.removeItem("ios_local_test_token");
+          sessionStorage.removeItem("ios_local_test_user");
+          setTestUser(null);
+          try {
+            const callbackToken = await completeCognitoLogin(hosted);
+            if (!active) return;
+            const accessToken = callbackToken || currentCognitoToken();
+            setToken(accessToken);
+            setAuthMode(accessToken ? "cognito" : null);
+            if (callbackToken)
+              setNotice("Signed in. You can now save analyses.");
+          } catch (error) {
+            if (!active) return;
+            clearCognitoSession();
+            setToken(null);
+            setAuthMode(null);
+            setNotice(
+              error instanceof Error ? error.message : "Sign-in failed.",
+            );
+          }
+        } else {
+          clearCognitoSession();
+          const localToken = capabilities.local_test_available
+            ? sessionStorage.getItem("ios_local_test_token")
+            : null;
+          setToken(localToken);
+          setAuthMode(localToken ? "local" : null);
+        }
+      })
+      .catch(() => {
+        if (!active) return;
+        setLocalAuthAvailable(false);
+        setCognito(null);
+        setToken(null);
+        setAuthMode(null);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
+  useEffect(() => {
+    if (authMode !== "cognito" || !token) return;
+    const timer = window.setInterval(() => {
+      if (currentCognitoToken()) return;
+      setToken(null);
+      setAuthMode(null);
+      setSaveToHistory(false);
+      setNotice("Your sign-in expired. Sign in again to use History.");
+    }, 30_000);
+    return () => window.clearInterval(timer);
+  }, [authMode, token]);
 
   async function signIn(user: "alice" | "bob") {
     try {
@@ -86,6 +162,7 @@ export default function App() {
       sessionStorage.setItem("ios_local_test_token", body.access_token);
       sessionStorage.setItem("ios_local_test_user", user);
       setToken(body.access_token);
+      setAuthMode("local");
       setTestUser(user);
       setNotice(`Signed in as local test user ${user}.`);
     } catch (error) {
@@ -94,15 +171,20 @@ export default function App() {
   }
 
   function signOut() {
+    const hostedLogout =
+      authMode === "cognito" && cognito ? cognitoLogoutUrl(cognito) : null;
     itemsRef.current.forEach((item) => URL.revokeObjectURL(item.preview));
     setItems([]);
     setSelectedId("");
     setSaveToHistory(false);
     sessionStorage.removeItem("ios_local_test_token");
     sessionStorage.removeItem("ios_local_test_user");
+    clearCognitoSession();
     setToken(null);
     setTestUser(null);
+    setAuthMode(null);
     setNotice("Signed out. Local image previews were cleared.");
+    if (hostedLogout) window.location.assign(hostedLogout);
   }
 
   function toggleModel(key: ModelKey) {
@@ -370,7 +452,11 @@ export default function App() {
         <div className="test-account">
           {token ? (
             <>
-              <span>Local test: {testUser}</span>
+              <span>
+                {authMode === "cognito"
+                  ? "Signed in"
+                  : `Local test: ${testUser}`}
+              </span>
               <button
                 type="button"
                 className="text-button"
@@ -380,6 +466,18 @@ export default function App() {
                 Sign out
               </button>
             </>
+          ) : cognito ? (
+            <button
+              type="button"
+              className="text-button"
+              onClick={() =>
+                beginCognitoLogin(cognito).catch(() =>
+                  setNotice("Sign-in could not be started."),
+                )
+              }
+            >
+              Sign in for History
+            </button>
           ) : localAuthAvailable ? (
             <>
               <span>Local test sign-in:</span>
@@ -405,7 +503,7 @@ export default function App() {
         {view === "analyze" ? (
           <>
             <section className="intro">
-              <p className="eyebrow">LOCAL IMAGE INSPECTION</p>
+              <p className="eyebrow">IMAGE ORIGIN INSPECTION</p>
               <h1>Inspect an image with two models.</h1>
               <p>
                 Compare separate model suggestions and Content Credentials.
@@ -494,10 +592,20 @@ export default function App() {
                 </p>
               )}
               <p className="privacy-note">
-                <strong>Local privacy:</strong> Images go to the backend on this
-                PC. Guest and unsaved analyses are not added to history. Saving
-                is available only with explicit opt-in during local test
-                sign-in.
+                {cognito ? (
+                  <>
+                    <strong>Privacy:</strong> Images are sent to this service
+                    for analysis. Guest and unsaved analyses are not added to
+                    History. Signed-in users can choose to save the unmodified
+                    original and result for 30 days.
+                  </>
+                ) : (
+                  <>
+                    <strong>Local privacy:</strong> Images are processed by the
+                    API on this PC. Guest and unsaved analyses are not added to
+                    History. Local test users can explicitly opt in to saving.
+                  </>
+                )}
               </p>
             </section>
 
@@ -853,12 +961,16 @@ export default function App() {
         ) : view === "gallery" ? (
           <Gallery cases={galleryCases} />
         ) : (
-          <History token={token} localAuthAvailable={localAuthAvailable} />
+          <History
+            token={token}
+            localAuthAvailable={localAuthAvailable}
+            cognitoAvailable={Boolean(cognito)}
+          />
         )}
       </main>
       <footer>
-        Image Origin Studio · Local release · Test identities only · No cloud
-        storage
+        Image Origin Studio · {cognito ? "Hosted release" : "Local release"} ·
+        Model suggestions are not proof of origin
       </footer>
     </div>
   );

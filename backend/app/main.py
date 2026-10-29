@@ -1,4 +1,4 @@
-"""Local image analysis and optional private-history API."""
+"""Image analysis API with optional local or AWS private-history storage."""
 
 from __future__ import annotations
 
@@ -21,7 +21,13 @@ from fastapi.responses import JSONResponse, Response
 from PIL import Image, ImageOps
 from pydantic import BaseModel, Field
 
-from .auth import issue_local_token, local_test_available, optional_identity, required_identity
+from .auth import (
+    cognito_config,
+    issue_local_token,
+    local_test_available,
+    optional_identity,
+    required_identity,
+)
 from .history import (
     HistoryNotFound,
     HistoryQuotaExceeded,
@@ -62,6 +68,13 @@ async def _history_cleanup_loop() -> None:
 
 @asynccontextmanager
 async def _lifespan(_app: FastAPI):
+    hosted_auth = cognito_config()  # Reject partial hosted settings before serving.
+    cloud_history = os.getenv("IOS_HISTORY_BACKEND", "local").lower() == "aws"
+    if bool(hosted_auth) != cloud_history:
+        raise RuntimeError(
+            "Hosted Cognito sign-in and AWS History must be configured together."
+        )
+    history_store()  # Fail at startup if an explicitly selected backend is misconfigured.
     cleanup = asyncio.create_task(_history_cleanup_loop())
     try:
         yield
@@ -87,8 +100,15 @@ class LocalTestSignIn(BaseModel):
 
 
 @app.get("/api/auth/capabilities")
-def auth_capabilities(request: Request) -> dict[str, bool]:
-    return {"local_test_available": local_test_available(request)}
+def auth_capabilities(request: Request) -> dict:
+    config = cognito_config()
+    return {
+        "local_test_available": local_test_available(request),
+        "cognito": (
+            {"client_id": config["client_id"], "domain": config["domain"]}
+            if config else None
+        ),
+    }
 
 
 @app.post("/api/auth/local-test")
@@ -280,10 +300,22 @@ def _history_store(root: str) -> HistoryStore:
 
 
 def history_store() -> HistoryStore:
+    backend = os.getenv("IOS_HISTORY_BACKEND", "local").lower()
+    if backend == "aws":
+        return _cloud_history_store()
+    if backend != "local":
+        raise RuntimeError("IOS_HISTORY_BACKEND must be 'local' or 'aws'.")
     root = os.getenv("IOS_HISTORY_ROOT") or str(
         Path(__file__).resolve().parents[2] / ".local" / "history"
     )
     return _history_store(root)
+
+
+@lru_cache(maxsize=1)
+def _cloud_history_store():
+    from .cloud_history import CloudHistoryStore
+
+    return CloudHistoryStore.from_environment()
 
 
 @app.post("/api/analyze/compare", response_model=ComparisonResult)

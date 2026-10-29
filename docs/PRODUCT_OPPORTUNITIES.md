@@ -2,7 +2,7 @@
 
 Research and product direction, 24 October 2026. This is a historical idea
 list, not the current feature status. The inspector, case report, C2PA panel,
-gallery draft, and optional localhost history were later implemented; the
+gallery, and optional localhost history were later implemented; the
 robustness lab was skipped by the owner. See the [current milestone table](NEXT_IMPLEMENTATION_PLAN.md).
 The local comparison works, while
 the [public paired pilot](PUBLIC_PILOT_2026-10-24.md) exposed V3 E2 mistakes
@@ -16,7 +16,7 @@ visible without promising that an AI detector can prove origin.
 | Priority | Idea | What the user experiences | Why it adds value | Scope |
 | --- | --- | --- | --- | --- |
 | 1 | **Case report and input-view inspector** | After upload, inspect the exact crop/resize each model received, then download a local report with image hash, model versions, thresholds, scores, errors, and caveats. | Makes the model pipeline understandable and the result reproducible. Avoid calling crop previews explanations of model reasoning. | Implemented locally |
-| 2 | **Known-origin challenge gallery** | Guess whether a licensed example is camera-made or generated, reveal its documented source, then see both model suggestions and their mistakes. Filter for disagreements and false alarms. | An engaging demonstration that teaches why a detector can fail. It also gives the UI a useful state before a visitor uploads private images. | Local draft; owner publication review remains |
+| 2 | **Known-origin challenge gallery** | Guess whether a licensed example is camera-made or generated, reveal its documented source, then see both model suggestions and their mistakes. Filter for disagreements and false alarms. | An engaging demonstration that teaches why a detector can fail. It also gives the UI a useful state before a visitor uploads private images. | Implemented locally; owner marked ready for publication on 26 October 2026 |
 | 3 | **Robustness lab** | On one uploaded image, try declared JPEG, resize, and crop variants. Show how each model's score and decision change in a small chart. Keep the original beside the transformed view. | Transformation sensitivity is a real research problem; making it visible is more honest and interesting than another confidence gauge. | Skipped by owner |
 | 4 | **Provenance panel** | Check for a verifiable C2PA Content Credential, show issuer/actions and validation state, and keep it separate from the two model scores. Show “no credential found” as unknown. | Adds an independent kind of evidence and a clear lesson about provenance versus statistical screening. | Local prototype; remaining checks recorded separately |
 | 5 | **Evaluation observatory** | A public page for dated, frozen evaluation runs with source mix, confusion counts, false alarms, subgroup slices, and a browsable failure gallery. | Supports a defensible resume story and makes limitations easy to inspect. | Medium after a larger independent set |
