@@ -29,7 +29,7 @@ container through IMDSv2. The public site must not expose port 8001.
 
 Before creating any billable resource, fill a copy of this worksheet using the
 [AWS Pricing Calculator](https://calculator.aws/) or current `ap-south-1`
-console prices. The [proposal's figures](AWS_TRIAL_PROPOSAL_2026-10-26.md)
+console prices. The [proposal's figures](archive/AWS_TRIAL_PROPOSAL_2026-10-26.md)
 are allowances, not a Mumbai quote.
 
 | Line | Exact Mumbai rate or estimate to record |
@@ -268,4 +268,4 @@ Budget, log resources, instance, any leftover EBS disk/snapshot, Elastic IP,
 IAM role/policy, security group, and dedicated DNS record. Check other regions
 for accidentally created trial resources. Recheck Billing after its reporting
 delay and record actual pre-credit and out-of-pocket costs. The full teardown
-inventory is in the [trial proposal](AWS_TRIAL_PROPOSAL_2026-10-26.md).
+inventory is in the [trial proposal](archive/AWS_TRIAL_PROPOSAL_2026-10-26.md).

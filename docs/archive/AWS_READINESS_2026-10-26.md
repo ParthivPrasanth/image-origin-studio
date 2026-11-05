@@ -2,7 +2,7 @@
 
 > **Dated local checkpoint.** “No AWS resource” below describes 26 October.
 > The owner deployed the public site on 29 October. For current status and
-> live-host checks, see [Deployment and operations](DEPLOYMENT.md).
+> live-host checks, see [Deployment and operations](../DEPLOYMENT.md).
 
 This is a local implementation record for the [AWS plan](AWS_IMPLEMENTATION_PLAN.md).
 No AWS resource was created. The baseline commit was `d5818ab`; the script,
@@ -20,7 +20,7 @@ container definition, and this record are subsequent working-tree changes.
 | Tablet browser, 768 × 1024 | Gallery grid and the then-current draft banner rendered clearly. The banner was removed after owner publication review. |
 | Input inspector | Original display copy, V3 E2 FFT and MobileNet views, and Community Forensics crop appeared with distinct recipes. |
 | Content Credentials | An unsigned gallery JPEG displayed “No Content Credential found” and said origin remains unknown. |
-| Local History | Alice opted in before analysis, retrieved the exact original with matching SHA-256, and opened the saved result/report preview. Sign-out hid History; Bob saw an empty account. A [full-page desktop capture](../output/review/release-sweep-history-desktop.png) records the saved-result screen. |
+| Local History | Alice opted in before analysis, retrieved the exact original with matching SHA-256, and opened the saved result/report preview. Sign-out hid History; Bob saw an empty account. A [full-page desktop capture](../../output/review/release-sweep-history-desktop.png) records the saved-result screen. |
 | Partial model error | The first browser run exposed a Community Forensics error because I launched the API without the documented `HF_HOME` setting and outbound downloads were unavailable. The app kept V3 E2 results visible. Restarting with the README cache setting and `HF_HUB_OFFLINE=1` made all eight two-model comparisons succeed. |
 
 The owner subsequently marked the saved/printed PDF, keyboard-only use, and
@@ -40,7 +40,7 @@ An isolated localhost API on port 8002 used a disposable History directory;
 the browser used a separate Vite server on port 5175. Ten copies of the public
 bird gallery image filled Alice's 10-item quota. The full-state explanation
 was visible and readable at phone and desktop widths; the
-[phone capture](../output/review/release-sweep-quota-phone.png) shows the
+[phone capture](../../output/review/release-sweep-quota-phone.png) shows the
 message. A stale item whose
 expiry was moved into the past showed a clear unavailable message and
 **Refresh History** action. Refresh removed it from the visible list. A
@@ -56,7 +56,7 @@ item. A subsequent headless Chromium run used one disposable public gallery
 image saved under local-test Alice. After confirming Delete in the browser,
 **The saved image was deleted.** remained visible through automatic list
 refresh, the list showed **No saved analyses**, and quota returned to 0 of 10.
-The [desktop capture](../output/review/release-sweep-delete-feedback.png)
+The [desktop capture](../../output/review/release-sweep-delete-feedback.png)
 records the resulting screen. The disposable data was removed after the check.
 Expired items can still count against
 quota until the hourly cleanup sweep completes, although they are already
@@ -79,7 +79,7 @@ AI-generated for it. The other three originals received V3 E2 real
 suggestions, but their browser credential states were invalid, so none is a
 real validated-credential/model conflict. A second, localhost-only API run
 used the same signed camping-mug bytes and a clearly test-only V3 E2 stub
-returning a real suggestion. The [browser capture](../output/review/release-sweep-c2pa-conflict-stub.png)
+returning a real suggestion. The [browser capture](../../output/review/release-sweep-c2pa-conflict-stub.png)
 shows the trusted claim, separate model suggestion, and visible disagreement
 message. The stub's 10% AI score is synthetic UI data, not a model result or
 accuracy evidence. The disposable API script and both test History stores
@@ -197,7 +197,7 @@ public rate limit, or multi-user latency guarantee.
 
 ## Phase 2: Linux container build and local verification
 
-The root [Dockerfile](../Dockerfile) and [.dockerignore](../.dockerignore) now
+The root [Dockerfile](../../Dockerfile) and [.dockerignore](../../.dockerignore) now
 define a CPU Python 3.12 backend image with the pinned Python lockfile,
 packaged V3 E2 artifact, a non-root runtime user, and writable model caches.
 The health check calls `/api/health`, which confirms only that the API process

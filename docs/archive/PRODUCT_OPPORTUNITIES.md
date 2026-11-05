@@ -5,7 +5,7 @@ list, not the current feature status. The inspector, case report, C2PA panel,
 gallery, and optional localhost history were later implemented; the
 robustness lab was skipped by the owner. See the [current milestone table](NEXT_IMPLEMENTATION_PLAN.md).
 The local comparison works, while
-the [public paired pilot](PUBLIC_PILOT_2026-10-24.md) exposed V3 E2 mistakes
+the [public paired pilot](../evaluation/PUBLIC_PILOT_2026-10-24.md) exposed V3 E2 mistakes
 on unfamiliar sources. The strongest direction is an **evidence workbench**:
 help a person understand the image, the two model suggestions, and the limits
 of each signal. That makes the owner's trained model and engineering work

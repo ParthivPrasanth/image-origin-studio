@@ -2,19 +2,19 @@
 
 **Status update (29 October 2026):** The owner deployed the public AWS site and
 confirmed HTTPS, both models, Cognito sign-in, and a History save. This file
-retains the implementation chronology; the [deployment guide](DEPLOYMENT.md)
+retains the implementation chronology; the [deployment guide](../DEPLOYMENT.md)
 tracks current host operations and remaining live checks. Historical milestone
 instructions below describe how features were built.
 
 | Work | Current state | Evidence or remaining gate |
 | --- | --- | --- |
 | Input inspector and case report (1–2) | Implemented locally | Backend checks and browser report review; the owner marked saved/printed PDF review done on 26 October 2026. |
-| Challenge gallery (3) | Eight-case local gallery | [Manifest](GALLERY_MANIFEST.json) and source records exist; the owner marked the cases and reveal wording ready for publication on 26 October 2026. |
-| Content Credentials (4) | Local browser prototype | [C2PA checks](C2PA_FEASIBILITY.md) include trusted, valid, invalid, and absent cases; a controlled conflict UI check is recorded. The owner reports completing the edge check separately, without fixture details in this record. |
+| Challenge gallery (3) | Eight-case local gallery | [Manifest](../GALLERY_MANIFEST.json) and source records exist; the owner marked the cases and reveal wording ready for publication on 26 October 2026. |
+| Content Credentials (4) | Local browser prototype | [C2PA checks](../C2PA_FEASIBILITY.md) include trusted, valid, invalid, and absent cases; a controlled conflict UI check is recorded. The owner reports completing the edge check separately, without fixture details in this record. |
 | Robustness lab (5) | Skipped by owner | No implementation planned. |
 | Site redesign | Implemented locally | [Review screenshots](SITE_REDESIGN_REVIEW.md) exist; complete the [remaining live-state matrix](SITE_REDESIGN_IMPLEMENTATION_PLAN.md) before release. |
 | Optional private history | Local path verified; hosted save confirmed | [Verification record](HISTORY_LOCAL_VERIFICATION_2026-10-25.md) covers SQLite behavior. Cognito login and S3/DynamoDB adapter passed local tests; the owner confirmed a hosted sign-in and save. Two-account isolation, failure/retry, and hosted deletion still need recorded checks. |
-| AWS readiness and deployment (6–7) | Public single-host deployment running | [26 October checkpoint](AWS_READINESS_2026-10-26.md) records local parity and sizing; [deployment guide](DEPLOYMENT.md) records the owner's live success and remaining cost, TLS, capacity, and privacy checks. |
+| AWS readiness and deployment (6–7) | Public single-host deployment running | [26 October checkpoint](AWS_READINESS_2026-10-26.md) records local parity and sizing; [deployment guide](../DEPLOYMENT.md) records the owner's live success and remaining cost, TLS, capacity, and privacy checks. |
 
 The sample report artifacts under `output/` are review examples, not accuracy
 evidence. The owner reports checking the earlier C2PA, saved-report, and gallery
@@ -288,6 +288,6 @@ For each milestone, run the relevant backend tests and Ruff, frontend format
 check and build, then manually check real local inference and browser states.
 Review the interface at phone, tablet, and desktop widths with keyboard,
 empty, loading, partial-error, and disagreement states. Keep README,
-`docs/WIREFRAMES.md`, and `docs/DEPLOYMENT.md` aligned with what actually
+`docs/archive/WIREFRAMES.md`, and `docs/DEPLOYMENT.md` aligned with what actually
 ships. At each handoff, report what was built, what was measured, what is
 planned, and the next gate.

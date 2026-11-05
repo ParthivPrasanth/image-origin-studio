@@ -18,3 +18,5 @@ model-cache/
 # Disposable browser-review captures from the release sweep. Earlier tracked
 # evidence under output/review remains available as a dated local record.
 output/review/release-sweep-*.png
+# Local screenshots and the review patch from the November frontend redesign.
+output/redesign-review-2026-11-04/

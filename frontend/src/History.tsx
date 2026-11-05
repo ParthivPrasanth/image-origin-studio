@@ -19,6 +19,8 @@ type Props = {
   token: string | null;
   localAuthAvailable: boolean;
   cognitoAvailable: boolean;
+  onSignIn?: () => void;
+  onLocalSignIn?: (user: "alice" | "bob") => void;
   onOpenSavedItem?: (item: HistoryItem, original: File) => void;
 };
 
@@ -62,6 +64,8 @@ export default function History({
   token,
   localAuthAvailable,
   cognitoAvailable,
+  onSignIn,
+  onLocalSignIn,
   onOpenSavedItem,
 }: Props) {
   const [items, setItems] = useState<HistoryItem[]>([]);
@@ -275,18 +279,56 @@ export default function History({
           </p>
         </header>
         <div className="history-signin" role="status">
-          <h2>
-            {cognitoAvailable || localAuthAvailable
-              ? "Sign in to open History"
-              : "History is off"}
-          </h2>
-          <p>
-            {cognitoAvailable
-              ? "Use Sign in for History in the header. Analyze and Gallery remain available without signing in."
-              : localAuthAvailable
-                ? "Use one of the local test identities in the header. Analyze and Gallery remain available without signing in."
+          <div className="history-signin-art" aria-hidden="true">
+            <span className="history-art-sheet sheet-back" />
+            <span className="history-art-sheet sheet-front">◌</span>
+          </div>
+          <div className="history-signin-copy">
+            <p className="history-eyebrow">YOUR PRIVATE ARCHIVE</p>
+            <h2>
+              {cognitoAvailable || localAuthAvailable
+                ? "A place for the analyses you keep."
+                : "History is off"}
+            </h2>
+            <p>
+              {cognitoAvailable || localAuthAvailable
+                ? "History holds only analyses you choose to save before running them. Reopen the original image and its results, or delete them at any time."
                 : "Sign-in is not configured. Analyze and Gallery remain available as a guest."}
-          </p>
+            </p>
+            {cognitoAvailable && onSignIn && (
+              <button
+                className="history-signin-button"
+                type="button"
+                onClick={onSignIn}
+              >
+                Sign in for History
+              </button>
+            )}
+            {localAuthAvailable && onLocalSignIn && (
+              <div
+                className="history-signin-actions"
+                aria-label="Local test sign-in"
+              >
+                <button
+                  className="history-signin-button"
+                  type="button"
+                  onClick={() => onLocalSignIn("alice")}
+                >
+                  Continue as Alice
+                </button>
+                <button
+                  className="history-signin-button secondary"
+                  type="button"
+                  onClick={() => onLocalSignIn("bob")}
+                >
+                  Continue as Bob
+                </button>
+              </div>
+            )}
+            <p className="history-guest-note">
+              Analyze and Gallery are available without signing in.
+            </p>
+          </div>
         </div>
       </section>
     );

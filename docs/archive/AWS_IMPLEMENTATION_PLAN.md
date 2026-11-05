@@ -2,7 +2,7 @@
 
 > **Historical implementation plan.** The owner deployed a public AWS site on
 > 29 October 2026. The future-tense stages below describe the original build
-> plan, not today's status. See [Deployment and operations](DEPLOYMENT.md).
+> plan, not today's status. See [Deployment and operations](../DEPLOYMENT.md).
 
 **Status:** implementation plan for owner review, 25 October 2026. The
 [26 October readiness checkpoint](AWS_READINESS_2026-10-26.md) records a
@@ -11,7 +11,7 @@ container run. No AWS resources have been created. Image Origin Studio currently
 locally with two pinned models, browser-side Content Credentials checks, and
 opt-in SQLite history for localhost test identities. The target is a small,
 working AWS release that keeps guest analysis open and gives signed-in users
-private, deletable history. [README](../README.md) describes the current app;
+private, deletable history. [README](../../README.md) describes the current app;
 [local history verification](HISTORY_LOCAL_VERIFICATION_2026-10-25.md) records
 what has been tested so far.
 
@@ -55,7 +55,7 @@ dated record under `docs/`.
    model failure, eight-file batch, History, quota-full, deleted, and expired
    states. Check keyboard navigation and report save/print once. Record which
    Content Credentials cases were checked in the actual browser; the
-   [C2PA record](C2PA_FEASIBILITY.md) names remaining case-specific gaps.
+   [C2PA record](../C2PA_FEASIBILITY.md) names remaining case-specific gaps.
 2. Resolve or explicitly defer any release-blocking issue. The owner marked
    the source-documented gallery's assets, labels, and reveal wording ready
    for public inclusion on 26 October 2026. Keep its source and rights records
@@ -63,7 +63,7 @@ dated record under `docs/`.
 3. Run backend tests/Ruff and frontend format/build checks; record versions,
    commit, and pass/fail results. Avoid a new model accuracy evaluation here.
 
-**Likely files:** `docs/SITE_REDESIGN_REVIEW.md`, `docs/C2PA_FEASIBILITY.md`,
+**Likely files:** `docs/archive/SITE_REDESIGN_REVIEW.md`, `docs/C2PA_FEASIBILITY.md`,
 small frontend fixes only if observed, and a dated release-sweep record.
 
 **Stop condition:** a privacy leak, broken history ownership, incorrect model
@@ -256,6 +256,6 @@ are checked and the owner reviews the final costed package. The owner's
 expiry of 29 April 2027; see the proposal for the separate Credits-page
 display. The Cognito browser/API path and S3/DynamoDB History adapter now
 exist locally; their unit and contract tests pass, but they have not been
-exercised against an AWS account. The [self-deployment runbook](AWS_SELF_DEPLOY_RUNBOOK.md)
+exercised against an AWS account. The [self-deployment runbook](../AWS_SELF_DEPLOY_RUNBOOK.md)
 records owner-executed setup, verification, and teardown. No resources have
 been created.

@@ -2,7 +2,7 @@
 
 > **Local release record.** These checks preceded the public AWS deployment.
 > They do not establish hosted account isolation, cost controls, or TLS renewal.
-> See [Deployment and operations](DEPLOYMENT.md#remaining-release-and-operations-checks).
+> See [Deployment and operations](../DEPLOYMENT.md#remaining-release-and-operations-checks).
 
 **Status:** local browser checklist marked complete, 26 October 2026. The [readiness record](AWS_READINESS_2026-10-26.md) distinguishes recorded tests from checks confirmed by the owner. This plan does not authorize or create AWS resources.
 
@@ -32,4 +32,4 @@
 This checklist covers local browser behavior. Public cloud release also needs
 hosted authentication and private storage, request controls, a cost/teardown
 review, model-weight usage review, and the C2PA trust-list refresh noted in
-[the C2PA record](C2PA_FEASIBILITY.md).
+[the C2PA record](../C2PA_FEASIBILITY.md).

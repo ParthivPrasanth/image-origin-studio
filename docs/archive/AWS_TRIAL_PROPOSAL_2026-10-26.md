@@ -4,7 +4,7 @@
 > October 2026 and later chose a **USD 20** planning ceiling. This document's
 > USD 35 figures and “no resources” statements describe the earlier proposal;
 > they are not the current cost limit or deployment status. Use the
-> [deployment and operations guide](DEPLOYMENT.md) and live AWS Billing for
+> [deployment and operations guide](../DEPLOYMENT.md) and live AWS Billing for
 > current decisions.
 
 Status: **proposal for owner review, not a deployment or final AWS quote**. No

@@ -323,6 +323,26 @@ export default function Gallery({ cases }: Props) {
                   )}
                 </div>
               </article>
+              <nav
+                className="gallery-case-rail"
+                aria-label="Other gallery cases"
+              >
+                {visibleCases.map((candidate) => (
+                  <button
+                    type="button"
+                    key={candidate.id}
+                    className={candidate.id === galleryCase.id ? "active" : ""}
+                    aria-current={
+                      candidate.id === galleryCase.id ? "true" : undefined
+                    }
+                    onClick={() => openCase(candidate.id)}
+                    title={candidate.title}
+                  >
+                    <img src={candidate.assetUrl} alt="" loading="lazy" />
+                    <span>{candidate.title}</span>
+                  </button>
+                ))}
+              </nav>
             </>
           );
         })()

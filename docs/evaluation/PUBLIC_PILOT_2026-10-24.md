@@ -68,11 +68,11 @@ git clone https://github.com/AI-Detect-Arena/benchmark-dataset.git .local\arena-
 git -C .local\arena-benchmark checkout 3014b54eec9d44c7ef60b4c7e0cda6aeb4735d5b
 $env:HF_HOME = (Join-Path (Get-Location) "model-cache")
 .\.venv\Scripts\python.exe scripts\compare_models.py `
-  --manifest docs\PUBLIC_PILOT_MANIFEST.csv `
+  --manifest docs\evaluation\PUBLIC_PILOT_MANIFEST.csv `
   --image-root .local\arena-benchmark\samples `
   --output .local\pilot-original-new.json
 .\.venv\Scripts\python.exe scripts\compare_models.py `
-  --manifest docs\PUBLIC_PILOT_MANIFEST.csv `
+  --manifest docs\evaluation\PUBLIC_PILOT_MANIFEST.csv `
   --image-root .local\arena-benchmark\samples `
   --variant jpeg90 --output .local\pilot-jpeg90-new.json
 ```

@@ -6,4 +6,4 @@ This folder keeps selected **local** review captures and example report files fr
 - `pdf/sample-case-report.pdf` and `review/sample-case-report.json` are example exports, not an accuracy sample or a saved private user history item.
 - New disposable review captures should stay in ignored local work or be deliberately curated and checked before publication. The four `release-sweep-*.png` files from this working session remain local and ignored.
 
-For current product behavior, start with the [project README](../README.md). For source-documented gallery assets and rights, use the [gallery manifest](../docs/GALLERY_MANIFEST.json) and [source records](../docs/README.md#evaluation-and-source-evidence).
+For current product behavior, start with the [project README](../README.md). For source-documented gallery assets and rights, use the [gallery manifest](../docs/GALLERY_MANIFEST.json) and [source records](../docs/README.md#gallery-sources).

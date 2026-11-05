@@ -245,6 +245,13 @@ export default function App() {
     }
   }
 
+  function clearBatch() {
+    itemsRef.current.forEach((item) => URL.revokeObjectURL(item.preview));
+    setItems([]);
+    setSelectedId("");
+    setNotice("");
+  }
+
   async function run(
     ids: string[],
     models: ModelKey[] = selectedModels,
@@ -314,7 +321,7 @@ export default function App() {
                   mergedModels.filter((entry) => entry.model_key === key),
                 ),
                 requestedModels: prior ? prior.requestedModels : requested,
-                history: response.history,
+                history: prior?.history ?? response.history,
               },
             };
           }),
@@ -500,438 +507,547 @@ export default function App() {
         </div>
       </header>
       <main>
+        {notice && (
+          <p className="notice app-notice" role="alert">
+            {notice}
+          </p>
+        )}
         {view === "analyze" ? (
           <>
             <section className="intro">
-              <p className="eyebrow">IMAGE ORIGIN INSPECTION</p>
-              <h1>Inspect an image with two models.</h1>
+              <p className="eyebrow">A WORKSPACE FOR IMAGE EVIDENCE</p>
+              <h1>Look closer at what an image can tell you.</h1>
               <p>
-                Compare separate model suggestions and Content Credentials.
-                Neither proves how an image was made.
+                Compare independent model suggestions, inspect their inputs, and
+                check for Content Credentials. None of these alone proves an
+                image’s origin.
               </p>
             </section>
-            <section className="analyze-workspace" aria-label="Analyze images">
-              <div className="upload-strip">
-                <div
-                  className="dropzone compact-dropzone"
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    addFiles(event.dataTransfer.files);
-                  }}
-                >
-                  <strong>Add images</strong>
-                  <span>
-                    JPEG, PNG, or WebP · up to 10 MB each · 8 per batch
-                  </span>
-                  <button
-                    type="button"
-                    className="primary"
-                    onClick={() => input.current?.click()}
-                  >
-                    Choose images
-                  </button>
-                  <input
-                    ref={input}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    multiple
-                    hidden
-                    onChange={(event) =>
-                      event.target.files && addFiles(event.target.files)
-                    }
-                  />
+            <div className="analyze-layout">
+              <section
+                className="analyze-workspace"
+                aria-label="Analyze images"
+              >
+                <div className="setup-heading">
+                  <p className="eyebrow">GET STARTED</p>
+                  <h2>Set up an analysis</h2>
+                  <p>Choose images and models, then review each result.</p>
                 </div>
-                <fieldset className="model-selector" disabled={busy}>
-                  <legend>Models for the next analysis</legend>
-                  {MODEL_KEYS.map((key) => (
-                    <label className="model-choice" key={key}>
-                      <input
-                        type="checkbox"
-                        checked={selectedModels.includes(key)}
-                        onChange={() => toggleModel(key)}
-                        aria-describedby={`${key}-credit`}
-                      />
-                      <span>
-                        <strong>{modelName(key)}</strong>
-                        <small id={`${key}-credit`}>
-                          {MODEL_INFO[key].credit}
-                        </small>
-                      </span>
-                    </label>
-                  ))}
-                  <p className="selector-note">
-                    Both are selected by default. Changing this does not relabel
-                    earlier results.
-                  </p>
-                  {token && (
-                    <label className="save-choice">
-                      <input
-                        type="checkbox"
-                        checked={saveToHistory}
-                        onChange={(event) =>
-                          setSaveToHistory(event.target.checked)
-                        }
-                      />
-                      <span>
-                        <strong>Save this analysis to my history</strong>
-                        <small>
-                          Off by default. Applies to each file in the next
-                          analysis batch. Keeps each unmodified original,
-                          including embedded metadata, and its result for 30
-                          days.
-                        </small>
-                      </span>
-                    </label>
-                  )}
-                </fieldset>
-              </div>
-              {notice && (
-                <p className="notice" role="alert">
-                  {notice}
-                </p>
-              )}
-              <p className="privacy-note">
-                {cognito ? (
-                  <>
-                    <strong>Privacy:</strong> Images are sent to this service
-                    for analysis. Guest and unsaved analyses are not added to
-                    History. Signed-in users can choose to save the unmodified
-                    original and result for 30 days.
-                  </>
-                ) : (
-                  <>
-                    <strong>Local privacy:</strong> Images are processed by the
-                    API on this PC. Guest and unsaved analyses are not added to
-                    History. Local test users can explicitly opt in to saving.
-                  </>
-                )}
-              </p>
-            </section>
-
-            {items.length === 0 ? (
-              <section className="empty-state compact-empty">
-                <h2>Your images and results will appear here.</h2>
-                <p>
-                  Add an image to begin. You can select up to eight images, then
-                  review one result at a time.
-                </p>
-              </section>
-            ) : (
-              <section className="review-workspace" aria-label="Image results">
-                <div className="image-queue">
-                  <div className="queue-heading">
-                    <h2>Images</h2>
-                    <span>
-                      {items.length} of {MAX_FILES}
-                    </span>
-                  </div>
-                  <div className="batch-actions">
-                    {pending.length > 0 && (
-                      <button
-                        className="primary small"
-                        disabled={busy}
-                        onClick={() => run(pending.map((item) => item.id))}
-                      >
-                        {busy ? "Processing…" : `Analyze ${pending.length}`}
-                      </button>
-                    )}
-                    {completed.length > 0 && (
-                      <button className="text-button" onClick={exportCsv}>
-                        Export CSV
-                      </button>
-                    )}
-                  </div>
-                  <ul className="result-list">
-                    {items.map((item) => {
-                      const outcomes = item.result?.requestedModels
-                        .map((key) => {
-                          const entry = resultFor(item.result!, key);
-                          return entry?.status === "success"
-                            ? `${modelName(key)}: ${entry.prediction === "fake" ? "AI-generated" : "Real"}`
-                            : entry?.status === "error"
-                              ? `${modelName(key)}: error`
-                              : "";
-                        })
-                        .filter(Boolean)
-                        .join(" · ");
-                      return (
-                        <li
-                          key={item.id}
-                          className={`queue-item ${item.id === selected?.id ? "selected" : ""}`}
-                        >
-                          <button
-                            type="button"
-                            className="queue-select"
-                            aria-current={
-                              item.id === selected?.id ? "true" : undefined
-                            }
-                            onClick={() => setSelectedId(item.id)}
-                          >
-                            <img src={item.preview} alt="" />
-                            <span className="queue-copy">
-                              <strong title={item.file.name}>
-                                {item.file.name}
-                              </strong>
-                              <small>
-                                {item.state === "processing"
-                                  ? "Analyzing…"
-                                  : item.state === "ready"
-                                    ? "Ready to analyze"
-                                    : item.state === "error"
-                                      ? "Request error"
-                                      : outcomes || "Analysis complete"}
-                              </small>
-                            </span>
-                          </button>
-                          <button
-                            className="remove"
-                            title="Remove image"
-                            aria-label={`Remove ${item.file.name}`}
-                            disabled={busy}
-                            onClick={() => remove(item.id)}
-                          >
-                            ×
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-                {selected && (
-                  <article
-                    className="selected-detail"
-                    aria-labelledby="selected-title"
+                <div className="upload-strip">
+                  <div
+                    className="dropzone compact-dropzone"
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      addFiles(event.dataTransfer.files);
+                    }}
                   >
-                    <div className="detail-heading">
-                      <img
-                        src={selected.preview}
-                        alt={`Preview of ${selected.file.name}`}
-                      />
-                      <div>
-                        <p className="eyebrow">SELECTED IMAGE</p>
-                        <h2 id="selected-title" title={selected.file.name}>
-                          {selected.file.name}
-                        </h2>
-                        <p className="file-meta">
-                          {niceSize(selected.file.size)} ·{" "}
-                          {selected.file.type.split("/")[1]?.toUpperCase()}
-                        </p>
-                      </div>
+                    <div className="step-title">
+                      <span className="step-number">01</span>
+                      <strong>Add images</strong>
                     </div>
-                    {selected.state === "processing" && (
-                      <p className="state processing" role="status">
-                        Analyzing with{" "}
-                        {selected.runningModels?.map(modelName).join(" and ")}…
-                      </p>
-                    )}
-                    {selected.state === "error" && (
-                      <p className="state error" role="alert">
-                        {selected.error}{" "}
-                        <button
-                          className="text-button"
-                          disabled={busy}
-                          onClick={() =>
-                            run(
-                              [selected.id],
-                              selected.runningModels ?? selectedModels,
-                              Boolean(selected.result),
-                            )
-                          }
-                        >
-                          Retry request
-                        </button>
-                      </p>
-                    )}
-                    {selected.result ? (
-                      <div className="analysis">
-                        {selected.result.history?.status === "saved" && (
-                          <p className="save-status" role="status">
-                            Saved to private history until{" "}
-                            {new Date(
-                              selected.result.history.expires_at!,
-                            ).toLocaleDateString()}
-                            . <a href="#history">Open History</a>
-                          </p>
-                        )}
-                        {selected.result.history?.status === "not_saved" && (
-                          <p className="save-status error" role="alert">
-                            Analysis complete but not saved:{" "}
-                            {selected.result.history.reason}
-                          </p>
-                        )}
-                        {disagreement(selected.result) === true && (
-                          <p className="disagreement" role="status">
-                            The models disagree on this image. Their suggestions
-                            and scores are independent.
-                          </p>
-                        )}
-                        <div className="model-rows">
-                          {selected.result.requestedModels.map((key) => {
-                            const entry = resultFor(selected.result!, key);
-                            return (
-                              <section
-                                className="model-row"
-                                key={key}
-                                aria-label={`${modelName(key)} result`}
-                              >
-                                <div>
-                                  <h3>{modelName(key)}</h3>
-                                  <p className="model-credit">
-                                    {MODEL_INFO[key].credit}
-                                  </p>
-                                </div>
-                                {entry?.status === "success" ? (
-                                  <div
-                                    className={`model-suggestion ${entry.prediction}`}
-                                  >
-                                    <span>Suggests</span>
-                                    <strong>
-                                      {entry.prediction === "fake"
-                                        ? "AI-generated"
-                                        : "Real"}
-                                    </strong>
-                                    <small>
-                                      AI model score{" "}
-                                      {score(entry.model_scores.fake)} · cutoff{" "}
-                                      {score(entry.ai_score_threshold)}
-                                    </small>
-                                  </div>
-                                ) : (
-                                  <div className="model-suggestion error">
-                                    <strong>
-                                      {entry?.status === "error"
-                                        ? "Could not analyze"
-                                        : "No result returned"}
-                                    </strong>
-                                    {entry?.status === "error" && (
-                                      <button
-                                        className="text-button"
-                                        disabled={busy}
-                                        onClick={() =>
-                                          run([selected.id], [key], true)
-                                        }
-                                      >
-                                        Retry {modelName(key)}
-                                      </button>
-                                    )}
-                                  </div>
-                                )}
-                                {entry?.status === "success" && (
-                                  <details className="technical-details">
-                                    <summary>Technical details</summary>
-                                    <p>
-                                      Real model score:{" "}
-                                      {score(entry.model_scores.real)}
-                                    </p>
-                                    <p>
-                                      AI-generated model score:{" "}
-                                      {score(entry.model_scores.fake)}
-                                    </p>
-                                    <p>
-                                      Cutoff: {score(entry.ai_score_threshold)}{" "}
-                                      · {entry.elapsed_ms.toFixed(0)} ms
-                                    </p>
-                                    <p>Model: {entry.model_id}</p>
-                                    <p>Revision: {entry.model_revision}</p>
-                                    <p>
-                                      Preprocessing:{" "}
-                                      {entry.preprocessing_recipe}
-                                    </p>
-                                  </details>
-                                )}
-                                {entry?.status === "error" && (
-                                  <p className="model-error" role="alert">
-                                    {entry.error}
-                                  </p>
-                                )}
-                              </section>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ) : (
-                      selected.state === "ready" && (
-                        <p className="state ready">
-                          Ready to analyze. Use the batch action beside the
-                          image list.
-                        </p>
-                      )
-                    )}
-                    <C2paPanel
-                      key={selected.id}
-                      file={selected.file}
-                      result={selected.result}
-                      credential={selected.credential}
-                      onResult={(credential) =>
-                        setItems((previous) =>
-                          previous.map((candidate) =>
-                            candidate.id === selected.id
-                              ? { ...candidate, credential }
-                              : candidate,
-                          ),
-                        )
+                    <span>
+                      JPEG, PNG, or WebP · up to 10 MB each · 8 per batch
+                    </span>
+                    <button
+                      type="button"
+                      className="primary"
+                      onClick={() => input.current?.click()}
+                    >
+                      Choose images
+                    </button>
+                    <input
+                      ref={input}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      hidden
+                      onChange={(event) =>
+                        event.target.files && addFiles(event.target.files)
                       }
                     />
-                    {selected.result && (
-                      <details className="secondary-actions">
-                        <summary>Inspect inputs or export report</summary>
-                        <InputInspector
-                          key={selected.result.models
-                            .map(
-                              (entry) =>
-                                `${entry.model_key}:${entry.analyzed_at}:${entry.status}`,
-                            )
-                            .join("|")}
-                          file={selected.file}
-                          result={selected.result}
-                          id={selected.id}
+                  </div>
+                  <fieldset className="model-selector" disabled={busy}>
+                    <legend>
+                      <span className="step-number">02</span> Choose models
+                    </legend>
+                    {MODEL_KEYS.map((key) => (
+                      <label className="model-choice" key={key}>
+                        <input
+                          type="checkbox"
+                          checked={selectedModels.includes(key)}
+                          onChange={() => toggleModel(key)}
+                          aria-describedby={`${key}-credit`}
                         />
-                        <div className="report-actions">
-                          <button
-                            className="text-button"
-                            type="button"
-                            onClick={() =>
-                              downloadReport(
-                                makeCaseReport(
-                                  selected.file.name,
-                                  selected.result!,
-                                  selected.credential,
-                                ),
-                              )
-                            }
-                          >
-                            Download JSON report
-                          </button>
-                          <button
-                            className="text-button"
-                            type="button"
-                            onClick={() =>
-                              printReport(
-                                makeCaseReport(
-                                  selected.file.name,
-                                  selected.result!,
-                                  selected.credential,
-                                ),
-                              )
-                            }
-                          >
-                            Print or save PDF
-                          </button>
-                          <button
-                            className="text-button"
-                            disabled={busy}
-                            onClick={() => run([selected.id])}
-                          >
-                            Analyze again
-                          </button>
-                        </div>
-                      </details>
+                        <span>
+                          <strong>{modelName(key)}</strong>
+                          <small id={`${key}-credit`}>
+                            {MODEL_INFO[key].credit}
+                          </small>
+                        </span>
+                      </label>
+                    ))}
+                    <p className="selector-note">
+                      Both are selected by default. Changing this does not
+                      relabel earlier results.
+                    </p>
+                    {token && (
+                      <label className="save-choice">
+                        <input
+                          type="checkbox"
+                          checked={saveToHistory}
+                          onChange={(event) =>
+                            setSaveToHistory(event.target.checked)
+                          }
+                        />
+                        <span>
+                          <strong>Save this analysis to my history</strong>
+                          <small>
+                            Off by default. Applies to each file in the next
+                            analysis batch. Keeps each unmodified original,
+                            including embedded metadata, and its result for 30
+                            days.
+                          </small>
+                        </span>
+                      </label>
                     )}
-                  </article>
-                )}
+                    {!token && (
+                      <p className="save-hint">
+                        Saving is optional after sign-in. Guest analyses stay
+                        out of History.
+                      </p>
+                    )}
+                  </fieldset>
+                </div>
+                <p className="privacy-note">
+                  {cognito ? (
+                    <>
+                      <strong>Privacy:</strong> Images are sent to this service
+                      for analysis. Guest and unsaved analyses are not added to
+                      History. Signed-in users can choose to save the unmodified
+                      original and result for 30 days.
+                    </>
+                  ) : (
+                    <>
+                      <strong>Local privacy:</strong> Images are processed by
+                      the API on this PC. Guest and unsaved analyses are not
+                      added to History. Local test users can explicitly opt in
+                      to saving.
+                    </>
+                  )}
+                </p>
               </section>
-            )}
+
+              {items.length === 0 ? (
+                <section className="empty-state compact-empty">
+                  <span className="empty-state-symbol" aria-hidden="true">
+                    ◌
+                  </span>
+                  <p className="eyebrow">YOUR WORKSPACE</p>
+                  <h2>Your images and results will appear here.</h2>
+                  <p>
+                    Add an image to begin. You can select up to eight images,
+                    then review one result at a time.
+                  </p>
+                </section>
+              ) : (
+                <section
+                  className="review-workspace"
+                  aria-label="Image results"
+                >
+                  <div className="image-queue">
+                    <div className="queue-heading">
+                      <h2>
+                        <span className="step-number">03</span> Image queue
+                      </h2>
+                      <span>
+                        {items.length} of {MAX_FILES}
+                      </span>
+                    </div>
+                    <div className="batch-actions">
+                      {pending.length > 0 && (
+                        <button
+                          className="primary small"
+                          disabled={busy}
+                          onClick={() => run(pending.map((item) => item.id))}
+                        >
+                          {busy ? "Processing…" : `Analyze ${pending.length}`}
+                        </button>
+                      )}
+                      {completed.length > 0 && (
+                        <button className="text-button" onClick={exportCsv}>
+                          Export CSV
+                        </button>
+                      )}
+                      <button
+                        className="text-button"
+                        disabled={busy}
+                        onClick={clearBatch}
+                      >
+                        Clear batch
+                      </button>
+                    </div>
+                    <ul className="result-list">
+                      {items.map((item) => {
+                        const outcomes = item.result?.requestedModels
+                          .map((key) => {
+                            const entry = resultFor(item.result!, key);
+                            return entry?.status === "success"
+                              ? `${modelName(key)}: ${entry.prediction === "fake" ? "AI-generated" : "Real"}`
+                              : entry?.status === "error"
+                                ? `${modelName(key)}: error`
+                                : "";
+                          })
+                          .filter(Boolean)
+                          .join(" · ");
+                        return (
+                          <li
+                            key={item.id}
+                            className={`queue-item ${item.id === selected?.id ? "selected" : ""}`}
+                          >
+                            <button
+                              type="button"
+                              className="queue-select"
+                              aria-current={
+                                item.id === selected?.id ? "true" : undefined
+                              }
+                              onClick={() => setSelectedId(item.id)}
+                            >
+                              <img src={item.preview} alt="" />
+                              <span className="queue-copy">
+                                <strong title={item.file.name}>
+                                  {item.file.name}
+                                </strong>
+                                <small>
+                                  {item.state === "processing"
+                                    ? "Analyzing…"
+                                    : item.state === "ready"
+                                      ? "Ready to analyze"
+                                      : item.state === "error"
+                                        ? "Request error"
+                                        : outcomes || "Analysis complete"}
+                                </small>
+                              </span>
+                            </button>
+                            <button
+                              className="remove"
+                              title="Remove image"
+                              aria-label={`Remove ${item.file.name}`}
+                              disabled={busy}
+                              onClick={() => remove(item.id)}
+                            >
+                              ×
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                  {selected && (
+                    <article
+                      className="selected-detail"
+                      aria-labelledby="selected-title"
+                    >
+                      <div className="detail-heading">
+                        <div>
+                          <p className="eyebrow">SELECTED IMAGE</p>
+                          <h2 id="selected-title" title={selected.file.name}>
+                            {selected.file.name}
+                          </h2>
+                          <p className="file-meta">
+                            {niceSize(selected.file.size)} ·{" "}
+                            {selected.file.type.split("/")[1]?.toUpperCase()}
+                          </p>
+                          {selected.result && (
+                            <p className="file-meta">
+                              API input: {selected.result.input.width} ×{" "}
+                              {selected.result.input.height} px ·{" "}
+                              {selected.result.image_format} · analyzed{" "}
+                              {new Date(
+                                selected.result.analyzed_at,
+                              ).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="result-stage">
+                        <div className="selected-preview">
+                          <img
+                            src={selected.preview}
+                            alt={`Preview of ${selected.file.name}`}
+                          />
+                          <div className="preview-caption">
+                            <span>Original upload</span>
+                            <span>{niceSize(selected.file.size)}</span>
+                          </div>
+                        </div>
+                        <div className="result-content">
+                          {selected.state === "processing" && (
+                            <p className="state processing" role="status">
+                              Analyzing with{" "}
+                              {selected.runningModels
+                                ?.map(modelName)
+                                .join(" and ")}
+                              …
+                            </p>
+                          )}
+                          {selected.state === "error" && (
+                            <p className="state error" role="alert">
+                              {selected.error}{" "}
+                              <button
+                                className="text-button"
+                                disabled={busy}
+                                onClick={() =>
+                                  run(
+                                    [selected.id],
+                                    selected.runningModels ?? selectedModels,
+                                    Boolean(selected.result),
+                                  )
+                                }
+                              >
+                                Retry request
+                              </button>
+                            </p>
+                          )}
+                          {selected.result ? (
+                            <div className="analysis">
+                              {selected.result.history?.status === "saved" && (
+                                <p className="save-status" role="status">
+                                  Saved to private history until{" "}
+                                  {new Date(
+                                    selected.result.history.expires_at!,
+                                  ).toLocaleDateString()}
+                                  . <a href="#history">Open History</a>
+                                </p>
+                              )}
+                              {selected.result.history?.status ===
+                                "not_saved" && (
+                                <p className="save-status error" role="alert">
+                                  Analysis complete but not saved:{" "}
+                                  {selected.result.history.reason}
+                                </p>
+                              )}
+                              {disagreement(selected.result) === true && (
+                                <p className="disagreement" role="status">
+                                  The models disagree on this image. Their
+                                  suggestions and scores are independent.
+                                </p>
+                              )}
+                              <div className="model-rows">
+                                {selected.result.requestedModels.map((key) => {
+                                  const entry = resultFor(
+                                    selected.result!,
+                                    key,
+                                  );
+                                  return (
+                                    <section
+                                      className="model-row"
+                                      key={key}
+                                      aria-label={`${modelName(key)} result`}
+                                    >
+                                      <div>
+                                        <h3>{modelName(key)}</h3>
+                                        <p className="model-credit">
+                                          {MODEL_INFO[key].credit}
+                                        </p>
+                                      </div>
+                                      {entry?.status === "success" ? (
+                                        <div
+                                          className={`model-suggestion ${entry.prediction}`}
+                                        >
+                                          <span>Suggests</span>
+                                          <strong>
+                                            {entry.prediction === "fake"
+                                              ? "AI-generated"
+                                              : "Real"}
+                                          </strong>
+                                          <small>
+                                            AI model score{" "}
+                                            {score(entry.model_scores.fake)} ·
+                                            cutoff{" "}
+                                            {score(entry.ai_score_threshold)}
+                                          </small>
+                                          <span
+                                            className="score-track"
+                                            aria-hidden="true"
+                                          >
+                                            <span
+                                              className="score-fill"
+                                              style={{
+                                                width: `${entry.model_scores.fake * 100}%`,
+                                              }}
+                                            />
+                                            <span
+                                              className="score-cutoff"
+                                              style={{
+                                                left: `${entry.ai_score_threshold * 100}%`,
+                                              }}
+                                            />
+                                          </span>
+                                        </div>
+                                      ) : (
+                                        <div className="model-suggestion error">
+                                          <strong>
+                                            {entry?.status === "error"
+                                              ? "Could not analyze"
+                                              : "No result returned"}
+                                          </strong>
+                                          {entry?.status === "error" && (
+                                            <button
+                                              className="text-button"
+                                              disabled={busy}
+                                              onClick={() =>
+                                                run([selected.id], [key], true)
+                                              }
+                                            >
+                                              Retry {modelName(key)}
+                                            </button>
+                                          )}
+                                        </div>
+                                      )}
+                                      {entry?.status === "success" && (
+                                        <details className="technical-details">
+                                          <summary>Technical details</summary>
+                                          <p>
+                                            Real model score:{" "}
+                                            {score(entry.model_scores.real)}
+                                          </p>
+                                          <p>
+                                            AI-generated model score:{" "}
+                                            {score(entry.model_scores.fake)}
+                                          </p>
+                                          <p>
+                                            Cutoff:{" "}
+                                            {score(entry.ai_score_threshold)} ·{" "}
+                                            {entry.elapsed_ms.toFixed(0)} ms
+                                          </p>
+                                          <p>Model: {entry.model_id}</p>
+                                          <p>
+                                            Revision: {entry.model_revision}
+                                          </p>
+                                          <p>
+                                            Preprocessing:{" "}
+                                            {entry.preprocessing_recipe}
+                                          </p>
+                                        </details>
+                                      )}
+                                      {entry?.status === "error" && (
+                                        <>
+                                          <p
+                                            className="model-error"
+                                            role="alert"
+                                          >
+                                            {entry.error}
+                                          </p>
+                                          <details className="technical-details">
+                                            <summary>
+                                              Model and decision details
+                                            </summary>
+                                            <p>Model: {entry.model_id}</p>
+                                            <p>
+                                              Revision: {entry.model_revision}
+                                            </p>
+                                            <p>
+                                              Preprocessing:{" "}
+                                              {entry.preprocessing_recipe}
+                                            </p>
+                                            <p>
+                                              AI flagging cutoff:{" "}
+                                              {score(entry.ai_score_threshold)}
+                                            </p>
+                                          </details>
+                                        </>
+                                      )}
+                                    </section>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ) : (
+                            selected.state === "ready" && (
+                              <p className="state ready">
+                                Ready to analyze. Use the batch action beside
+                                the image list.
+                              </p>
+                            )
+                          )}
+                          <C2paPanel
+                            key={selected.id}
+                            file={selected.file}
+                            result={selected.result}
+                            credential={selected.credential}
+                            onResult={(credential) =>
+                              setItems((previous) =>
+                                previous.map((candidate) =>
+                                  candidate.id === selected.id
+                                    ? { ...candidate, credential }
+                                    : candidate,
+                                ),
+                              )
+                            }
+                          />
+                          {selected.result && (
+                            <details className="secondary-actions">
+                              <summary>Inspect inputs or export report</summary>
+                              <InputInspector
+                                key={selected.result.models
+                                  .map(
+                                    (entry) =>
+                                      `${entry.model_key}:${entry.analyzed_at}:${entry.status}`,
+                                  )
+                                  .join("|")}
+                                file={selected.file}
+                                result={selected.result}
+                                id={selected.id}
+                              />
+                              <div className="report-actions">
+                                <button
+                                  className="text-button"
+                                  type="button"
+                                  onClick={() =>
+                                    downloadReport(
+                                      makeCaseReport(
+                                        selected.file.name,
+                                        selected.result!,
+                                        selected.credential,
+                                      ),
+                                    )
+                                  }
+                                >
+                                  Download JSON report
+                                </button>
+                                <button
+                                  className="text-button"
+                                  type="button"
+                                  onClick={() =>
+                                    printReport(
+                                      makeCaseReport(
+                                        selected.file.name,
+                                        selected.result!,
+                                        selected.credential,
+                                      ),
+                                    )
+                                  }
+                                >
+                                  Print or save PDF
+                                </button>
+                                <button
+                                  className="text-button"
+                                  disabled={busy}
+                                  onClick={() => run([selected.id])}
+                                >
+                                  Analyze again
+                                </button>
+                              </div>
+                            </details>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  )}
+                </section>
+              )}
+            </div>
             <details className="about">
               <summary>How to read this comparison</summary>
               <h2>Two scores are not a verdict.</h2>
@@ -965,6 +1081,15 @@ export default function App() {
             token={token}
             localAuthAvailable={localAuthAvailable}
             cognitoAvailable={Boolean(cognito)}
+            onSignIn={
+              cognito
+                ? () =>
+                    beginCognitoLogin(cognito).catch(() =>
+                      setNotice("Sign-in could not be started."),
+                    )
+                : undefined
+            }
+            onLocalSignIn={signIn}
           />
         )}
       </main>
